@@ -13,8 +13,8 @@
   <script src="//cdn.jsdelivr.net/npm/phaser-ce@2.11.0/build/phaser.js"></script>
   <script>
     var socket = io();
-    //manage socket here
 
+    //triggered by submit-button (nickname submit button)
     function checkNickName()
     {
       var nameInputField = document.getElementById('input_name');
@@ -31,6 +31,13 @@
         return;
       }
       socket.emit('nicknameRequest', {name : nickname});
+      socket.on('nicknameAccepted', ()=>{
+        //dispose form (hide) and display (show) a new form to join/create room.
+        console.log('nickname Accepted');
+      });
+      socket.on('nicknameRejected', ()=>{
+        warningLabel.innerHTML = 'Nickname already in use.';
+      });
     }
   </script>
   <style>

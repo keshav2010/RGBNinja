@@ -1,5 +1,3 @@
-//handles socket connection
-
 /*
   Name Convention to follow
     > all the function arguments should begin with _  (example : _name, _arg)
@@ -7,14 +5,14 @@
 */
 var socketio = require('socket.io');
 var io;
-var guestNumber = 1;
-var nickNames = {};
-var namesUsed = [];
+var usedNames = [];
 var currentRoom = {};
 
 exports.listen = function(server)
 {
   io = socketio.listen(server);
+
+  //called when a socket is created on client request
   io.sockets.on('connection', (socket)=>{
 
     //emitted by nickname dialog, this is responsible for checking if nickname is
@@ -25,6 +23,13 @@ exports.listen = function(server)
       if(nameAvailable(nicknameData.name))
       {
           //mark name as used
+          usedNames[ nicknameData.name] = true;
+          console.log(usedNames[nicknameData.name] + " < marked" );
+          socket.emit('nicknameAccepted');
+      }
+      else{
+        console.log('DEBUG : name is already in use');
+        socket.emit('nicknameRejected');
       }
     });
 
@@ -35,9 +40,12 @@ exports.listen = function(server)
     });
   });
 };
-function nameAvailable( _name )
+function nameAvailable( _name)
 {
-
+  if(usedNames[_name] == undefined)
+    return true;
+  else if(usedNames[ _name] == true)
+    return false;
 }
 
 
