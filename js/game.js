@@ -1,5 +1,3 @@
-
-//client side
 //const socket = io();
 //NOTE : this is a client-side file, do not use require() as it will not work, it is meant to be for server side only and
 //in order to use it for browser side, we need to use browserify or other third party tools, however try to write entire code in 1 single page
@@ -30,13 +28,11 @@ var game = new Phaser.Game(1024, 768, Phaser.CANVAS, '',
     this.game.stage.backgroundColor = "rgb("+getRand(50, 150)+","+getRand(0, 60)+","+getRand(100, 200)+")";
     this.loginText = game.add.bitmapText(this.game.world.centerX - 200, 25, 'loginTitle', 'RGB\nNinja', 72);
     this.loginText.text = 'rgb ninja';
-
   },
   update : function()
   {
 
   }
-
 });//end of game object
 
 class MainMenu extends Phaser.State
