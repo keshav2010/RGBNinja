@@ -1,3 +1,152 @@
+
+//client side
+//const socket = io();
+//NOTE : this is a client-side file, do not use require() as it will not work, it is meant to be for server side only and
+//in order to use it for browser side, we need to use browserify or other third party tools, however try to write entire code in 1 single page
+//for avoiding learning so many libraries
+//Use : http://kvazars.com/littera/ to generate bitmap font's xml file (.fnt / xml)
+var game = new Phaser.Game(800, 600, Phaser.CANVAS, '',
+{
+  init: function(){
+    console.log("game>init");
+    this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+    this.scale.maxWidth = 800;
+    this.scale.maxHeight = 600;
+    this.scale.pageAlignHorizontally = true;
+    this.scale.pageAlignVertically = true;
+    this.scale.updateLayout();
+  },
+  inputFocus: function(sprite){
+    sprite.canvasInput.focus();
+  },
+  createLabel : function(x, y, text, cssStyle)
+  {
+    var label = game.add.text(x, y, text, cssStyle);
+    label.anchor.set(0.5);
+    return label;
+  },
+  inputFocus: function(sprite){
+   sprite.canvasInput.focus();
+  },
+  createInput: function(x, y){
+    var bmd = this.add.bitmapData(400, 50);
+    var inp = this.game.add.sprite(x, y, bmd);
+    inp.canvasInput = new CanvasInput({
+      canvas: bmd.canvas,
+      fontSize: 30,
+      fontFamily: 'Arial',
+      fontColor: '#212121',
+      fontWeight: 'bold',
+      width: 320,
+      padding: 5,
+      borderWidth: 4,
+      borderColor: 'green',
+      borderRadius: 50,
+      boxShadow: '1px 1px 0px #fff',
+      innerShadow: '0px 0px 5px rgba(0, 0, 0, 0.5)',
+      placeHolder: 'Enter Nickname...'
+    });
+    inp.inputEnabled = true;
+    inp.input.useHandCursor = true;
+    inp.events.onInputUp.add(this.inputFocus, this, 0, );
+    return inp;
+  },
+  preload : function()
+  {
+    console.log('game>preload');
+    this.state.add('MainMenu', MainMenu);
+    this.state.add('Game', Game);
+    this.state.add('GameOver', GameOver);
+    this.game.load.bitmapFont('loginTitle', '/assets/fonts/pixograd.png', '/assets/fonts/pixograd.fnt');
+  },
+  create : function()
+  {
+    console.log('game>create');
+    this.game.stage.backgroundColor = "rgb("+getRand(50, 150)+","+getRand(0, 60)+","+getRand(100, 200)+")";
+    this.createField(this.game.world.centerX - 200, this.game.world.centerY - 150, 'Nickname :', {});
+    this.loginText = game.add.bitmapText(200, 30, 'loginTitle', 'RGB\nNinja', 72);
+    this.loginText.text = 'RGB Ninja';
+
+  },
+  update : function()
+  {
+
+  },
+  //helper method to create an input field
+  createField : function(x, y, labelText, styleCss){
+    this.createLabel(x+100, y-10, labelText, {});
+    this.myInput = this.createInput(x, y);
+    this.myInput.events.onInputUp.add(this.inputFocus, this, 0, this.myInput);
+    this.myInput.canvasInput.focus();
+  }
+
+});//end of game object
+
+class MainMenu extends Phaser.State
+{
+  preload()
+  {
+
+  }
+  create()
+  {
+
+  }
+  update()
+  {
+
+  }
+}
+class Game extends Phaser.State
+{
+  preload()
+  {
+
+  }
+  create()
+  {
+
+  }
+  update()
+  {
+
+  }
+}
+class GameOver extends Phaser.State
+{
+  preload()
+  {
+
+  }
+  create()
+  {
+
+  }
+  update()
+  {
+
+  }
+}
+
+const getRand = function(low, high){
+  return Math.floor((Math.random() * high) + low);
+}
+
+/*
+game.state.add('Login', Login);
+game.state.add('MainMenu', MainMenu);
+game.state.add('Game', Game);
+game.state.add('GameOver', GameOver);
+
+game.state.start('Login');
+*/
+socket.on('message', (data)=>{
+  console.log(data);
+});
+
+
+
+//----------------------------
 /*!
  *  CanvasInput v1.2.7
  *  http://goldfirestudios.com/blog/108/CanvasInput-HTML5-Canvas-Text-Input
@@ -1473,149 +1622,3 @@
     }
   };
 })();
-
-//client side
-//const socket = io();
-//NOTE : this is a client-side file, do not use require() as it will not work, it is meant to be for server side only and
-//in order to use it for browser side, we need to use browserify or other third party tools, however try to write entire code in 1 single page
-//for avoiding learning so many libraries
-
-//Use : http://kvazars.com/littera/ to generate bitmap font's xml file (.fnt / xml)
-var game = new Phaser.Game(800, 600, Phaser.CANVAS, '',
-{
-  init: function(){
-    console.log("game>init");
-    this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-    this.scale.maxWidth = 800;
-    this.scale.maxHeight = 600;
-    this.scale.pageAlignHorizontally = true;
-    this.scale.pageAlignVertically = true;
-    this.scale.updateLayout();
-  },
-  inputFocus: function(sprite){
-    sprite.canvasInput.focus();
-  },
-  createInput: function(x, y){
-    var bmd = this.add.bitmapData(400, 50);
-    var myInput = this.game.add.sprite(x, y, bmd);
-    myInput.canvasInput = new CanvasInput({
-      canvas: bmd.canvas,
-      fontSize: 30,
-      fontFamily: 'Arial',
-      fontColor: '#212121',
-      fontWeight: 'bold',
-      width: 400,
-      padding: 8,
-      borderWidth: 1,
-      borderColor: '#000',
-      borderRadius: 3,
-      boxShadow: '1px 1px 0px #fff',
-      innerShadow: '0px 0px 5px rgba(0, 0, 0, 0.5)',
-      placeHolder: 'Enter message here...'
-    });
-    myInput.inputEnabled = true;
-    myInput.input.useHandCursor = true;
-    myInput.events.onInputUp.add(this.inputFocus, this);
-    return myInput;
-  },
-
-  preload : function()
-  {
-    console.log('game>preload');
-    this.state.add('Login', Login);
-    this.state.add('MainMenu', MainMenu);
-    this.state.add('Game', Game);
-    this.state.add('GameOver', GameOver);
-  },
-  create : function()
-  {
-    console.log('game>create');
-    this.state.start('Login');
-  }
-});//end of game object
-
-
-//State refers to single scene (level)
-class Login extends Phaser.State
-{
-  constructor()
-  {
-    super({key:'Login'});
-  }
-  preload()
-  {
-    this.game.load.bitmapFont('loginTitle', '/assets/fonts/pixograd.png', '/assets/fonts/pixograd.fnt');
-  }
-  create()
-  {
-
-    this.loginText = game.add.bitmapText(200, 30, 'loginTitle', 'RGB\nNinja', 72);
-    this.game.stage.backgroundColor = "rgb("+getRand(50, 150)+","+getRand(0, 60)+","+getRand(100, 200)+")";
-
-  }
-  update()
-  {
-     this.loginText.text = 'RGB Ninja \n\t\t\t Beta';
-  }
-}
-class MainMenu extends Phaser.State
-{
-  preload()
-  {
-
-  }
-  create()
-  {
-
-  }
-  update()
-  {
-
-  }
-}
-class Game extends Phaser.State
-{
-  preload()
-  {
-
-  }
-  create()
-  {
-
-  }
-  update()
-  {
-
-  }
-}
-class GameOver extends Phaser.State
-{
-  preload()
-  {
-
-  }
-  create()
-  {
-
-  }
-  update()
-  {
-
-  }
-}
-
-const getRand = function(low, high){
-  return Math.floor((Math.random() * high) + low);
-}
-
-/*
-game.state.add('Login', Login);
-game.state.add('MainMenu', MainMenu);
-game.state.add('Game', Game);
-game.state.add('GameOver', GameOver);
-
-game.state.start('Login');
-*/
-socket.on('message', (data)=>{
-  console.log(data);
-});
