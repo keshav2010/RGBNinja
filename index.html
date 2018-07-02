@@ -1,7 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang='en'>
 
 <head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
   <title> RGB Ninja </title>
   <!-- exposes io global -->
   <script src="/socket.io/socket.io.js"></script>
@@ -10,12 +14,55 @@
     var socket = io();
     //manage socket here
   </script>
+  <style>
+  body
+  {
+    font-family: helvetica,Helvetica,Arial,sans-serif;
+    font-size: 32px;
+    line-height: 1.43;
+    background-color: black;
+    color: black;
+  }
+  .center-container
+  {
+    display : inline-block;
+    vertical-align: top;
+    width: 400px;
+    height: 200px;
+    background-color: rgba(100, 200, 150, 0.7);
+    padding-left : 20px;
+    padding-right: 20px;
+    padding-top : 20px;
+  }
+  </style>
 </head>
 
 <body>
+  <!-- overlays are dialogs for taking user nickname input -->
+  <div id="overlays" style="position:absolute; left:0; right:0; top:0; bottom:0; z-index: 200;">
+
+    <div id="userDetailPanel" class="center-container container-fluid">
+      <div role="form" novalidate="" style="background-color:rgb(230, 230, 230);">
+        <div class="form-group">
+          <div style="float:left;">RGBNinja</div>
+          <div style="float:right;"> lol </div>
+        </div>
+        <div class="form-group">
+          <input> hey </input>
+          <button type="button" class="btn btn-dark">Submit</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <!-- end of overlays -->
+
   <div id="game">
   </div>
-</body>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+  <script src="/js/game.js"></script>
 
-<script src="/js/game.js"></script>
+</body>
 </html>
