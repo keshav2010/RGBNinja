@@ -19,10 +19,18 @@
     {
       var nameInputField = document.getElementById('input_name');
       var warningLabel = document.getElementById('warningLabel');
-      if(nameInputField.value.trim().length == 0)
-      {
-        warningLabel.innerHTML = 'Nickname cannot be left empty';
+      var nickname = nameInputField.value.trim();
+      /*
+        Nickname can include any character except spaces
+      */
+      if(nickname.length == 0){
+        warningLabel.innerHTML = 'Nickname cannot be left empty !!!';
+        return;
+      }else if(nickname.includes(' ')){
+        warningLabel.innerHTML = 'Nickname cannot contain spaces. Use _ instead';
+        return;
       }
+      socket.emit('nicknameRequest', {name : nickname});
     }
   </script>
   <style>

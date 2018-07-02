@@ -1,5 +1,10 @@
 //handles socket connection
 
+/*
+  Name Convention to follow
+    > all the function arguments should begin with _  (example : _name, _arg)
+    > function name should be like functionName() instead of function_Name(), with the first character must not be capitalized
+*/
 var socketio = require('socket.io');
 var io;
 var guestNumber = 1;
@@ -10,35 +15,33 @@ var currentRoom = {};
 exports.listen = function(server)
 {
   io = socketio.listen(server);
-  io.set('log level', 1);
-
   io.sockets.on('connection', (socket)=>{
-    //assign user
-    guestNumber = assignGuestName(socket, guestNumber, nickNames, namesUsed);
-    joinRoom(socket, 'Lobby');
-    handleRoomJoining(socket);
-    socket.on('rooms', ()=>{
-      socket.emit('rooms', io.of('/').adapter.rooms);
+
+    //emitted by nickname dialog, this is responsible for checking if nickname is
+    //available or not, if available register it by mapping it to user id (socket id)
+    //note that this assumes that the nicknameData is valid
+    socket.on('nicknameRequest', (nicknameData)=>{
+      console.log('nickname Request accepted for name : ' + nicknameData.name);
+      if(nameAvailable(nicknameData.name))
+      {
+          //mark name as used
+      }
     });
-    handleClientDisconnection(socket, nickNames, namesUsed);
+
+    socket.on('disconnect', ()=>{
+      // on disconnection,perform following steps
+      // > mark the nickname as available
+      // *etc (more update coming soon)
+    });
   });
 };
-
-function assignGuestName(socket, guestNumber, nickNames, namesUsed)
+function nameAvailable( _name )
 {
-  var name = 'Guest' + guestNumber;
-  nickNames[socket.id] = name;
 
-  //let user know their name
-  socket.emit('nameResult',{
-    success : true,
-    name : name
-  });
-
-  //mark as used
-  namesUsed.push(name);
-  return guestNumber+1;
 }
+
+
+/*
 function joinRoom(socket, roomName)
 {
   socket.join(roomName);
@@ -57,11 +60,4 @@ function handleRoomJoining(socket)
     joinRoom(socket, room.newRoom);
   });
 }
-function handleClientDisconnection(socket, nickNames, namesUsed)
-{
-  socket.on('disconnect', ()=>{
-    var nameIndex = namesUsed.indexOf(nickNames[socket.id]);
-    delete namesUsed[nameIndex];
-    delete nickNames[socket.id];
-  });
-}
+*/
