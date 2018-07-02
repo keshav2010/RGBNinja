@@ -5,6 +5,7 @@
 
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link href="https://fonts.googleapis.com/css?family=Wendy+One" rel="stylesheet">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
   <title> RGB Ninja </title>
   <!-- exposes io global -->
@@ -17,19 +18,43 @@
   <style>
   body
   {
-    font-family: helvetica,Helvetica,Arial,sans-serif;
-    font-size: 32px;
+    font-family: 'Wendy One', sans-serif;
+    font-size: 36px;
     line-height: 1.43;
     background-color: black;
     color: black;
+  }
+  #userDetailPanel
+  {
+    margin-top : 100px;
+    background-color: white;
+    border-style: solid;
+    border-width: 15px;
+    border-radius: 50px;
+    border-color: rgb(100, 100, 100);
+    -webkit-animation: cssAnimation 2s 1 ease;
+    -moz-animation: cssAnimation 2s 1 ease;
+    -o-animation: cssAnimation 2s 1 ease;
+    }
+    @-webkit-keyframes cssAnimation {
+    from { -webkit-transform: rotate(4deg) scale(0) skew(1deg) translate(10px); }
+    to { -webkit-transform: rotate(0deg) scale(1) skew(1deg) translate(0px); }
+    }
+    @-moz-keyframes cssAnimation {
+    from { -moz-transform: rotate(4deg) scale(0) skew(1deg) translate(10px); }
+    to { -moz-transform: rotate(0deg) scale(1) skew(1deg) translate(0px); }
+    }
+    @-o-keyframes cssAnimation {
+    from { -o-transform: rotate(4deg) scale(0) skew(1deg) translate(10px); }
+    to { -o-transform: rotate(0deg) scale(1) skew(1deg) translate(0px); }
+
   }
   .center-container
   {
     display : inline-block;
     vertical-align: top;
     width: 400px;
-    height: 200px;
-    background-color: rgba(100, 200, 150, 0.7);
+    height: 225px;
     padding-left : 20px;
     padding-right: 20px;
     padding-top : 20px;
@@ -40,20 +65,17 @@
 <body>
   <!-- overlays are dialogs for taking user nickname input -->
   <div id="overlays" style="position:absolute; left:0; right:0; top:0; bottom:0; z-index: 200;">
-
+    <center>
     <div id="userDetailPanel" class="center-container container-fluid">
-      <div role="form" novalidate="" style="background-color:rgb(230, 230, 230);">
+      <div role="form" novalidate="">
         <div class="form-group">
-          <div style="float:left;">RGBNinja</div>
-          <div style="float:right;"> lol </div>
-        </div>
-        <div class="form-group">
-          <input> hey </input>
-          <button type="button" class="btn btn-dark">Submit</button>
+          <label style="color: rgb(150, 50, 200)">Guest Profile</label>
+          <input class="form-control" type="text" style="margin-top : 15px; margin-bottom: 15px;" placeholder="Enter Nickname">
+          <button type="button" class="btn btn-success">Accept</button>
         </div>
       </div>
     </div>
-
+    </center>
   </div>
   <!-- end of overlays -->
 
