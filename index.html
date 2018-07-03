@@ -18,7 +18,7 @@
     function checkNickName()
     {
       var nameInputField = document.getElementById('input_name');
-      var warningLabel = document.getElementById('warningLabel');
+      var warningLabel = document.getElementById('nicknameWarningLabel');
       var nickname = nameInputField.value.trim();
       /*
         Nickname can include any character except spaces
@@ -34,6 +34,10 @@
       socket.on('nicknameAccepted', ()=>{
         //dispose form (hide) and display (show) a new form to join/create room.
         console.log('nickname Accepted');
+        var form2 = $('#form2');
+        $('#form1').remove();
+        form2.removeClass('hide');
+        form2.addClass('slideToPosAnim');
       });
       socket.on('nicknameRejected', ()=>{
         warningLabel.innerHTML = 'Nickname already in use.';
@@ -49,40 +53,68 @@
     background-color: black;
     color: black;
   }
-  #userDetailPanel
+  .form-group
   {
     margin-top : 100px;
     background-color: white;
     border-style: solid;
-    border-width: 15px;
+    border-width: 10px;
     border-radius: 50px;
-    border-color: rgb(100, 100, 100);
-    -webkit-animation: cssAnimation 2s 1 ease;
-    -moz-animation: cssAnimation 2s 1 ease;
-    -o-animation: cssAnimation 2s 1 ease;
-    }
-    @-webkit-keyframes cssAnimation {
-    from { -webkit-transform: rotate(4deg) scale(0) skew(1deg) translate(10px); }
-    to { -webkit-transform: rotate(0deg) scale(1) skew(1deg) translate(0px); }
-    }
-    @-moz-keyframes cssAnimation {
-    from { -moz-transform: rotate(4deg) scale(0) skew(1deg) translate(10px); }
-    to { -moz-transform: rotate(0deg) scale(1) skew(1deg) translate(0px); }
-    }
-    @-o-keyframes cssAnimation {
-    from { -o-transform: rotate(4deg) scale(0) skew(1deg) translate(10px); }
-    to { -o-transform: rotate(0deg) scale(1) skew(1deg) translate(0px); }
-
+    border-color: green;
+    width: 450px;
+    height: 230px;
   }
+
+  .slideInAnim
+  {
+  -webkit-animation: slideInAnimation 2s 1 ease;
+  -moz-animation: slideInAnimation 2s 1 ease;
+  -o-animation: slideInAnimation 2s 1 ease;
+  }
+  @-webkit-keyframes slideInAnimation {
+  from { -webkit-transform: rotate(0deg) scale(0.1) skew(1deg) translate(10px); }
+  to { -webkit-transform: rotate(0deg) scale(1) skew(1deg) translate(0px); }
+  }
+  @-moz-keyframes slideInAnimation {
+  from { -moz-transform: rotate(0deg) scale(0.1) skew(1deg) translate(10px); }
+  to { -moz-transform: rotate(0deg) scale(1) skew(1deg) translate(0px); }
+  }
+  @-o-keyframes slideInAnimation {
+  from { -o-transform: rotate(0deg) scale(0.1) skew(1deg) translate(10px); }
+  to { -o-transform: rotate(0deg) scale(1) skew(1deg) translate(0px); }
+  }
+
+
+  .slideToPosAnim {
+  -webkit-animation: slideToPosAnimation 2s 1 ease;
+  -moz-animation: slideToPosAnimation 2s 1 ease;
+  -o-animation: slideToPosAnimation 2s 1 ease;
+  }
+  @-webkit-keyframes slideToPosAnimation {
+   from { -webkit-transform: rotate(0deg) scale(0) skew(1deg) translate(-300px); }
+   to { -webkit-transform: rotate(0deg) scale(1) skew(1deg) translate(0px); }
+   }
+   @-moz-keyframes slideToPosAnimation {
+   from { -moz-transform: rotate(0deg) scale(0) skew(1deg) translate(-300px); }
+   to { -moz-transform: rotate(0deg) scale(1) skew(1deg) translate(0px); }
+   }
+   @-o-keyframes slideToPosAnimation {
+   from { -o-transform: rotate(0deg) scale(0) skew(1deg) translate(-300px); }
+   to { -o-transform: rotate(0deg) scale(1) skew(1deg) translate(0px); }
+  }
+
   .center-container
   {
     display : inline-block;
     vertical-align: top;
-    width: 400px;
-    height: 260px;
+
     padding-left : 20px;
     padding-right: 20px;
     padding-top : 20px;
+  }
+  .hide
+  {
+    display : none;
   }
   </style>
 </head>
@@ -93,12 +125,22 @@
     <center>
     <div id="userDetailPanel" class="center-container container-fluid">
       <div role="form" novalidate="">
-        <div class="form-group">
+        <div class="form-group slideInAnim" id='form1'>
           <label style="color: rgb(150, 50, 200)">Guest Profile</label>
-          <input class="form-control" type="text" style="margin-top : 15px; margin-bottom: 15px;" placeholder="Enter Nickname" id="input_name">
+          <input class="form-control" type="text" style="margin-top : 15px; margin-bottom: 15px; width:380px" placeholder="Enter Nickname" id="input_name">
           <button type="button" class="btn btn-success" onclick="checkNickName()">Accept</button>
-          <p id="warningLabel" style='font-size:12px; color:red'></p>
+          <p id="nicknameWarningLabel" style='font-size:12px; color:red'></p>
         </div>
+
+        <!-- hidden by default-->
+        <div class="form-group hide" id='form2'>
+          <label style="color:rgb(200, 100, 150)">RGBNinja</label>
+          <input class='form-control' type='text' style="margin-top : 15px; margin-bottom: 15px; width:380px" placeholder="Room ID" id="input_roomId">
+          <button type="button" class="btn btn-success" onclick=""> Join </button>
+          <button type="button" class="btn btn-warning" onclick=""> Create Room </button>
+          <p id="roomWarningLabel" style='font-size:12px; color:red'></p>
+        </div>
+
       </div>
     </div>
     </center>

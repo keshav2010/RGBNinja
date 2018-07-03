@@ -14,7 +14,7 @@ exports.listen = function(server)
 
   //called when a socket is created on client request
   io.sockets.on('connection', (socket)=>{
-
+    console.log("socket id : "+socket.id);
     //emitted by nickname dialog, this is responsible for checking if nickname is
     //available or not, if available register it by mapping it to user id (socket id)
     //note that this assumes that the nicknameData is valid
@@ -34,6 +34,7 @@ exports.listen = function(server)
     });
 
     socket.on('disconnect', ()=>{
+      console.log('disconnnect > socket id : ' + socket.id);
       // on disconnection,perform following steps
       // > mark the nickname as available
       // *etc (more update coming soon)
