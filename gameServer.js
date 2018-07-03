@@ -1,6 +1,6 @@
 /*
   Name Convention to follow
-    > all the function arguments should begin with _  (example : _name, _arg)
+    > all the helper function arguments should begin with _  (example : _name, _arg)
     > function name should be like functionName() instead of function_Name(), with the first character must not be capitalized
 */
 var socketio = require('socket.io');
@@ -31,6 +31,11 @@ exports.listen = function(server)
         console.log('DEBUG : name is already in use');
         socket.emit('nicknameRejected');
       }
+    });
+
+    socket.on('roomJoinRequest', (roomData)=>{
+      console.log("room join request by > socket id : "+socket.id);
+      socket.emit('roomJoinRejected');
     });
 
     socket.on('disconnect', ()=>{
