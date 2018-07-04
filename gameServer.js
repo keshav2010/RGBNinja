@@ -37,7 +37,11 @@ exports.listen = function(server)
       console.log("room join request by > socket id : "+socket.id);
       socket.emit('roomJoinRejected');
     });
-
+// creating new room
+      socket.on("roomCreateRequest",(roomData)=>{
+         socket.join(roomData.roomName);
+          socket.emit("roomCreateAccepted");
+      });
     socket.on('disconnect', ()=>{
       console.log('disconnnect > socket id : ' + socket.id);
       // on disconnection,perform following steps

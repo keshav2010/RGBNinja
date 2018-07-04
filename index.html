@@ -64,6 +64,25 @@
         roomWarningLabel.innerHTML = "No such room created by any user";
       });
     }
+    function createRoom(){
+        var roomNameField = document.getElementById("input_roomName");
+          var roomWarningLabel = document.getElementById("roomWarningLabel");
+          var roomName = roomNameField.value.trim();
+          if(roomName.length == 0){
+            roomWarningLabel.innerHTML = "Enter Room name to join!!!";
+            return;
+          }
+          else if(roomName.includes(' ')){
+            roomWarningLabel.innerHTML = "Room name cannot contain spaces, use _ instead";
+            return;
+          }
+        socket.emit("roomCreateRequest",{roomName : roomName});
+        socket.on("roomCreateAccepted",function(){
+           alert("succesfully created room name : "+roomName); 
+        });
+
+        
+    };
   </script>
   <style>
   body{
@@ -152,7 +171,7 @@
           <p id="usernameLabel" style="font-size:12px; color:green"></p>
           <input class='form-control' type='text' style="margin-top : 15px; margin-bottom: 15px; width:380px" placeholder="Room Name..." id="input_roomName">
           <button type="button" class="btn btn-success" onclick="checkRoom()"> Join </button>
-          <button type="button" class="btn btn-warning" onclick=""> Create Room </button>
+          <button type="button" class="btn btn-warning" onclick="createRoom()"> Create Room </button>
           <p id="roomWarningLabel" style='font-size:12px; color:red'></p>
         </div>
 
