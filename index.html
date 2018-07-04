@@ -58,10 +58,11 @@
         return;
       }
       socket.emit('roomJoinRequest', {roomName : roomName});
-      socket.on('roomJoinAccepted', ()=>{});
-      socket.on('roomJoinRejected', ()=>{
-        console.log("room join rejected for socket >(socket id) : "+socket.id);
-        roomWarningLabel.innerHTML = "No such room created by any user";
+      socket.on('roomJoinAccepted', ()=>{
+          roomWarningLabel.innerHTML=" ";
+      });
+      socket.on('roomJoinRejected', (message)=>{
+        roomWarningLabel.innerHTML = message;
       });
     }
     function createRoom(){
@@ -78,10 +79,13 @@
           }
         socket.emit("roomCreateRequest",{roomName : roomName});
         socket.on("roomCreateAccepted",function(){
-           alert("succesfully created room name : "+roomName); 
+            var form2 = $("#form2");
+            form2.hide();
+            alert('room created');
         });
-
-        
+        socket.on("roomCreateRejected", function(){
+           roomWarningLabel.innerHTML = "Room name already in use, please choose different name."; 
+        });
     };
   </script>
   <style>
