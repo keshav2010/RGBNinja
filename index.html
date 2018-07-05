@@ -71,10 +71,10 @@
           console.log("joined into : ");
           var form2 = $("#form2");
             form2.hide();
-         var instruction = $("#roomInstructions");
-         instruction.hide();
-         var game=$("#game");
-         game.removeClass("hide");
+         var form3 = $("#form3");
+         form3.hide();
+         var instructionForm=$("#instructionForm");
+         instructionForm.removeClass("hide");
 
       });
     function createRoom(){
@@ -95,8 +95,9 @@
 
             var form2 = $("#form2");
             form2.hide();
-            var instruction = $("#roomInstructions");
-            var roomDisplay=document.getElementById("roomDisplay");
+            var form3 = $("#form3");
+            form3.removeClass("hide");
+            var roomDisplay = document.getElementById("roomDisplay");
             roomDisplay.innerHTML=roomName;
             
             instruction.removeClass('hide');
@@ -198,15 +199,15 @@
           <button type="button" class="btn btn-warning" onclick="createRoom()"> Create Room </button>
           <p id="roomWarningLabel" style='font-size:12px; color:red'></p>
         </div>
-        <div id="roomInstructions" class="form-group hide">
+        
+        <div id="form3" class="form-group hide">
             <p>Room name :  <span id="roomDisplay"></span> <br>Share the name with opponent.</p>
             <p>User matched : <span id="userJoined">1</span>/2</p>
-<!--            <button type="button" class="btn btn-success">Play</button>-->
         </div>
-        <div id="game" class="form-group hide">
-            <p><center>Instructions</center></p>
-<!--            <p><span id="userJoined">1</span>/2</p>-->
-<!--            <button type="button" class="btn btn-success">Play</button>-->
+        
+        <div id="instructionForm" class="form-group hide">
+            <p><center>Instructions</center></p><br>
+            <p style="font-size: 16px">Use the sliders to increase value of <br> primary colors, you cannot however <br> decrease the RGB (Red,Green,Blue) amount</p>
         </div>
       </div>
     </div>

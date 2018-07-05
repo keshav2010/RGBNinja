@@ -1,9 +1,12 @@
-//const socket = io();
-//NOTE : this is a client-side file, do not use require() as it will not work, it is meant to be for server side only and
-//in order to use it for browser side, we need to use browserify or other third party tools, however try to write entire code in 1 single page
-//for avoiding learning so many libraries
-//Use : http://kvazars.com/littera/ to generate bitmap font's xml file (.fnt / xml)
+/*
+NOTE : this is a client-side file, do not use require() as it will not work, it is meant to be for server side only and
+in order to use it for browser side, we need to use browserify or other third party tools, however try to write entire code in 1 single page
+for avoiding learning so many libraries
+Use : http://kvazars.com/littera/ to generate bitmap font's xml file (.fnt / xml)
+*/
+
 var socket = io();
+
 var game = new Phaser.Game(1024, 768, Phaser.CANVAS, '',
 {
   init: function(){

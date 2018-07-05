@@ -119,12 +119,3 @@ function leaveRoom(_socket)
     }
     delete currentRoom[ _socket.id];
 }
-/*
-function handleRoomJoining(socket)
-{
-  socket.on('join', (room)=>{
-    socket.leave(currentRoom[socket.id]);
-    joinRoom(socket, room.newRoom);
-  });
-}
-*/
