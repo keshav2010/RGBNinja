@@ -3,6 +3,7 @@
 //in order to use it for browser side, we need to use browserify or other third party tools, however try to write entire code in 1 single page
 //for avoiding learning so many libraries
 //Use : http://kvazars.com/littera/ to generate bitmap font's xml file (.fnt / xml)
+var socket = io();
 var game = new Phaser.Game(1024, 768, Phaser.CANVAS, '',
 {
   init: function(){
@@ -17,7 +18,6 @@ var game = new Phaser.Game(1024, 768, Phaser.CANVAS, '',
   preload : function()
   {
     console.log('game>preload');
-    this.state.add('MainMenu', MainMenu);
     this.state.add('Game', Game);
     this.state.add('GameOver', GameOver);
     this.game.load.bitmapFont('loginTitle', '/assets/fonts/pixograd.png', '/assets/fonts/pixograd.fnt');
@@ -28,42 +28,25 @@ var game = new Phaser.Game(1024, 768, Phaser.CANVAS, '',
     this.game.stage.backgroundColor = "rgb("+getRand(50, 150)+","+getRand(0, 60)+","+getRand(100, 200)+")";
     this.loginText = game.add.bitmapText(this.game.world.centerX - 200, 25, 'loginTitle', 'RGB\nNinja', 72);
     this.loginText.text = 'rgb ninja';
-  },
-  update : function()
-  {
-
+    socket.on('welcomeMessage', ()=>{ alert('lol')});
   }
 });//end of game object
 
-class MainMenu extends Phaser.State
-{
-  preload()
-  {
 
-  }
-  create()
-  {
-
-  }
-  update()
-  {
-
-  }
-}
 class Game extends Phaser.State
 {
-  preload()
-  {
+    preload()
+    {
 
-  }
-  create()
-  {
+    }
+    create()
+    {
 
-  }
-  update()
-  {
+    }
+    update()
+    {
 
-  }
+    }
 }
 class GameOver extends Phaser.State
 {
@@ -86,13 +69,8 @@ const getRand = function(low, high){
 }
 
 /*
-game.state.add('Login', Login);
-game.state.add('MainMenu', MainMenu);
 game.state.add('Game', Game);
 game.state.add('GameOver', GameOver);
 
-game.state.start('Login');
+game.state.start('Game');
 */
-socket.on('message', (data)=>{
-  console.log(data);
-});

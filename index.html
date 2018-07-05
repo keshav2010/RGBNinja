@@ -58,13 +58,25 @@
         return;
       }
       socket.emit('roomJoinRequest', {roomName : roomName});
-      socket.on('roomJoinAccepted', ()=>{
+      socket.on('roomJoinAccepted', function(roomData){
           roomWarningLabel.innerHTML=" ";
+//          alert("joined into : "+roomData.roomName);
       });
+       
       socket.on('roomJoinRejected', (message)=>{
         roomWarningLabel.innerHTML = message;
       });
     }
+     socket.on("welcomeMessage",function(){
+          console.log("joined into : ");
+          var form2 = $("#form2");
+            form2.hide();
+         var instruction = $("#roomInstructions");
+         instruction.hide();
+         var game=$("#game");
+         game.removeClass("hide");
+
+      });
     function createRoom(){
         var roomNameField = document.getElementById("input_roomName");
           var roomWarningLabel = document.getElementById("roomWarningLabel");
@@ -79,9 +91,16 @@
           }
         socket.emit("roomCreateRequest",{roomName : roomName});
         socket.on("roomCreateAccepted",function(){
+            roomWarningLabel.innerHTML = " "; 
+
             var form2 = $("#form2");
             form2.hide();
-            alert('room created');
+            var instruction = $("#roomInstructions");
+            var roomDisplay=document.getElementById("roomDisplay");
+            roomDisplay.innerHTML=roomName;
+            
+            instruction.removeClass('hide');
+            instruction.addClass('slideToPosAnim');
         });
         socket.on("roomCreateRejected", function(){
            roomWarningLabel.innerHTML = "Room name already in use, please choose different name."; 
@@ -97,14 +116,15 @@
     color: black;
   }
   .form-group{
-    margin-top : 100px;
+    margin-top : 3.3em;
+    padding: auto;
     background-color: white;
     border-style: solid;
     border-width: 10px;
     border-radius: 50px;
     border-color: green;
     width: 450px;
-    height: 240px;
+    height: 8.5em;
   }
 
   .slideInAnim{
@@ -178,7 +198,16 @@
           <button type="button" class="btn btn-warning" onclick="createRoom()"> Create Room </button>
           <p id="roomWarningLabel" style='font-size:12px; color:red'></p>
         </div>
-
+        <div id="roomInstructions" class="form-group hide">
+            <p>Room name :  <span id="roomDisplay"></span> <br>Share the name with opponent.</p>
+            <p>User matched : <span id="userJoined">1</span>/2</p>
+<!--            <button type="button" class="btn btn-success">Play</button>-->
+        </div>
+        <div id="game" class="form-group hide">
+            <p><center>Instructions</center></p>
+<!--            <p><span id="userJoined">1</span>/2</p>-->
+<!--            <button type="button" class="btn btn-success">Play</button>-->
+        </div>
       </div>
     </div>
     </center>

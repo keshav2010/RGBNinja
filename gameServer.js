@@ -56,7 +56,9 @@ exports.listen = function(server)
                 socket.emit('roomJoinRejected', "Sorry, Room is already full.");
             else {
                 joinRoom(socket, roomData.roomName);
+                io.sockets.emit("welcomeMessage");
                 socket.emit('roomJoinAccepted');
+                
             }
         });
         
