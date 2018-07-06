@@ -4,17 +4,17 @@ in order to use it for browser side, we need to use browserify or other third pa
 for avoiding learning so many libraries
 Use : http://kvazars.com/littera/ to generate bitmap font's xml file (.fnt / xml)
 */
-
-var socket = io();
-
+var playerName;
+var roomName;
 var game = new Phaser.Game(1024, 768, Phaser.CANVAS, '',
 {
   init: function(){
-    console.log("game>init");
+    console.log("game>init for socket "+socket.id);
+    //basic configuration
     this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
     this.scale.maxWidth = 1024;
     this.scale.maxHeight = 768;
-    this.scale.pageAlignHorizontally = true;
+    this.scale.pageAlignHorizontally = true;    
     this.scale.pageAlignVertically = true;
     this.scale.updateLayout();
   },
@@ -31,31 +31,35 @@ var game = new Phaser.Game(1024, 768, Phaser.CANVAS, '',
     this.game.stage.backgroundColor = "rgb("+getRand(50, 150)+","+getRand(0, 60)+","+getRand(100, 200)+")";
     this.loginText = game.add.bitmapText(this.game.world.centerX - 200, 25, 'loginTitle', 'RGB\nNinja', 72);
     this.loginText.text = 'rgb ninja';
-    socket.on('welcomeMessage', ()=>{ alert('lol')});
+    socket.on('launchGameState', ()=>{
+        alert('triggered launchGameState');    
+    });
   }
-});//end of game object
-
+});
+//game
 
 class Game extends Phaser.State
 {
     preload()
     {
-
+        console.log("game>preload");
     }
     create()
     {
-
+        console.log("game>create");
+        this.game.stage.backgroundColor = "rgb(0, 0, 0)";
+        console.log("game>create>socet id : "+socket.id);
     }
     update()
     {
-
+        console.log("game>update");
     }
 }
 class GameOver extends Phaser.State
 {
   preload()
   {
-
+      
   }
   create()
   {
@@ -67,6 +71,7 @@ class GameOver extends Phaser.State
   }
 }
 
+//helper method
 const getRand = function(low, high){
   return Math.floor((Math.random() * high) + low);
 }

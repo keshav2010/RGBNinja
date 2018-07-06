@@ -20,7 +20,7 @@ exports.listen = function(server)
     
     //called when a socket is created on client request
     io.sockets.on('connection', function(socket){
-        console.log("socket id : "+socket.id);        
+        console.log("connection > socketID: "+socket.id);        
         //emitted by nickname dialog, responsible for checking nickname availibity
         socket.on('nicknameRequest', function(nicknameData){
           if(clientNameAvailable(nicknameData.name))
@@ -56,15 +56,17 @@ exports.listen = function(server)
                 socket.emit('roomJoinRejected', "Sorry, Room is already full.");
             else {
                 joinRoom(socket, roomData.roomName);
-                io.sockets.emit("welcomeMessage");
                 socket.emit('roomJoinAccepted');
                 
+                //see index.html for on('gameBegin')
+                //emit gameBegin signal for all connected sockets of given room
+                io.to(roomData.roomName).emit('gameBegin');
             }
         });
         
         socket.on('disconnect', function(){
-          // on disconnection,perform following steps
-            leaveRoom(socket);//reduce client count inside usedRoomName map by -1 (if 0, delete key), remove currentRoom's key
+            console.log("disconnect socket : "+socket.id);
+            leaveRoom(socket);
             delete usedNames[ userName[socket.id]];
             delete userName[socket.id];
         });
@@ -101,7 +103,6 @@ function joinRoom(_socket, _roomName)
     usedRoomNames[ _roomName] += 1;
     
     _socket.emit('roomJoinAccepted', {room : _roomName});
-    //_socket.broadcast.to(_roomName).emit('message', {text: userName[_socket.id] + ' has joined ' + _roomName + '.'});
 }
 
 
