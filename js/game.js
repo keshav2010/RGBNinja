@@ -17,6 +17,7 @@ var game = new Phaser.Game(1024, 768, Phaser.CANVAS, '',
     this.scale.pageAlignHorizontally = true;    
     this.scale.pageAlignVertically = true;
     this.scale.updateLayout();
+    this.stage.disableVisibilityChange = true;
   },
   preload : function()
   {
@@ -24,15 +25,20 @@ var game = new Phaser.Game(1024, 768, Phaser.CANVAS, '',
     this.state.add('Game', Game);
     this.state.add('GameOver', GameOver);
     this.game.load.bitmapFont('loginTitle', '/assets/fonts/pixograd.png', '/assets/fonts/pixograd.fnt');
-  },
+  },    
   create : function()
   {
     console.log('game>create');
+    
     this.game.stage.backgroundColor = "rgb("+getRand(50, 150)+","+getRand(0, 60)+","+getRand(100, 200)+")";
     this.loginText = game.add.bitmapText(this.game.world.centerX - 200, 25, 'loginTitle', 'RGB\nNinja', 72);
     this.loginText.text = 'rgb ninja';
-    socket.on('launchGameState', ()=>{
-        alert('triggered launchGameState');    
+    console.log("socket is : "+socket.id);
+    
+    //error ; this is never triggered, socket.on() doesn't work
+    socket.on("launchGameState", ()=>{
+        console.log("launchedd bitchess");
+        alert("launching game state"); 
     });
   }
 });
@@ -75,10 +81,3 @@ class GameOver extends Phaser.State
 const getRand = function(low, high){
   return Math.floor((Math.random() * high) + low);
 }
-
-/*
-game.state.add('Game', Game);
-game.state.add('GameOver', GameOver);
-
-game.state.start('Game');
-*/

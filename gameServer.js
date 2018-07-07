@@ -18,8 +18,8 @@ exports.listen = function(server)
 {
     io = socketio.listen(server);
     
-    //called when a socket is created on client request
     io.sockets.on('connection', function(socket){
+        
         console.log("connection > socketID: "+socket.id);        
         //emitted by nickname dialog, responsible for checking nickname availibity
         socket.on('nicknameRequest', function(nicknameData){

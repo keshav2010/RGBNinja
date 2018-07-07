@@ -3,230 +3,267 @@
 
 <head>
 
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link href="https://fonts.googleapis.com/css?family=Wendy+One" rel="stylesheet">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
-  <title> RGB Ninja </title>
-  <!-- exposes io global -->
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/phaser-ce@2.11.0/build/phaser.js"></script>
-  <script>
-    var socket = io();
-      
-    //signal is recieved by each client of room
-    socket.on("gameBegin",function(){
-        var form2 = $("#form2");
-        form2.hide();
-        var form3 = $("#form3");
-        form3.hide();
-        var instructionForm=$("#instructionForm");
-        instructionForm.removeClass("hide");
-        
-        instructionForm.hide();
-        console.log('emit launchGameState');
-        socket.emit('launchGameState'); //see game.js
-        
-    });
-    //triggered by submit-button (nickname submit button)
-    function checkNickName()
-    {
-      var nameInputField = document.getElementById('input_name');
-      var warningLabel = document.getElementById('nicknameWarningLabel');
-      var nickname = nameInputField.value.trim();
-      var usernameLabel = document.getElementById('usernameLabel');
-      //Nickname can include any character except spaces
-      if(nickname.length == 0){
-        warningLabel.innerHTML = 'Nickname cannot be left empty !!!';
-        return;
-      }else if(nickname.includes(' ')){
-        warningLabel.innerHTML = 'Nickname cannot contain spaces. Use _ instead';
-        return;
-      }
-      socket.emit('nicknameRequest', {name : nickname});
-      socket.on('nicknameAccepted', ()=>{
-        //dispose form (hide) and display (show) a new form to join/create room.
-        console.log('nickname Accepted');
-        var form2 = $('#form2');
-        $('#form1').remove();
-        form2.removeClass('hide');
-        form2.addClass('slideToPosAnim');
-        usernameLabel.innerHTML = "Your nickname : "+nickname;
-      });
-      socket.on('nicknameRejected', ()=>{
-        warningLabel.innerHTML = 'Nickname already in use.';
-      });
-    }
-
-    function checkRoom()
-    {
-      var roomNameField = document.getElementById("input_roomName");
-      var roomWarningLabel = document.getElementById("roomWarningLabel");
-      var roomName = roomNameField.value.trim();
-      if(roomName.length == 0){
-        roomWarningLabel.innerHTML = "Enter Room name to join!!!";
-        return;
-      }
-      else if(roomName.includes(' ')){
-        roomWarningLabel.innerHTML = "Room name cannot contain spaces, use _ instead";
-        return;
-      }
-      socket.emit('roomJoinRequest', {roomName : roomName});
-      socket.on('roomJoinAccepted', function(roomData){
-          roomWarningLabel.innerHTML=" ";
-//          alert("joined into : "+roomData.roomName);
-      });
-       
-      socket.on('roomJoinRejected', (message)=>{
-        roomWarningLabel.innerHTML = message;
-      });
-    }
-    function createRoom(){
-        var roomNameField = document.getElementById("input_roomName");
-          var roomWarningLabel = document.getElementById("roomWarningLabel");
-          var roomName = roomNameField.value.trim();
-          if(roomName.length == 0){
-            roomWarningLabel.innerHTML = "Enter Room name to join!!!";
-            return;
-          }
-          else if(roomName.includes(' ')){
-            roomWarningLabel.innerHTML = "Room name cannot contain spaces, use _ instead";
-            return;
-          }
-        socket.emit("roomCreateRequest",{roomName : roomName});
-        socket.on("roomCreateAccepted",function(){
-            roomWarningLabel.innerHTML = " "; 
-
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css?family=Wendy+One" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <title> RGB Ninja </title>
+    <!-- exposes io global -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/phaser-ce@2.11.0/build/phaser.js"></script>
+    <script>
+        //connect to localhost
+        var socket = io.connect();
+        //signal is recieved by each client of room
+        socket.on("gameBegin", function() {
             var form2 = $("#form2");
             form2.hide();
             var form3 = $("#form3");
-            form3.removeClass("hide");
-            var roomDisplay = document.getElementById("roomDisplay");
-            roomDisplay.innerHTML=roomName;
-            
-            instruction.removeClass('hide');
-            instruction.addClass('slideToPosAnim');
+            form3.hide();
+            var instructionForm = $("#instructionForm");
+            instructionForm.removeClass("hide");
+            instructionForm.addClass('slideToPosAnim');
+            setTimeout(function(){
+                socket.emit("launchGameState");
+                console.log("launched gamestate emitted");
+            }, 5000);
         });
-        socket.on("roomCreateRejected", function(){
-           roomWarningLabel.innerHTML = "Room name already in use, please choose different name."; 
-        });
-    };
-  </script>
-  <style>
-  body{
-    font-family: 'Wendy One', sans-serif;
-    font-size: 36px;
-    line-height: 1.43;
-    background-color: black;
-    color: black;
-  }
-  .form-group{
-    margin-top : 3.3em;
-    padding: auto;
-    background-color: white;
-    border-style: solid;
-    border-width: 10px;
-    border-radius: 50px;
-    border-color: green;
-    width: 450px;
-    height: 8.5em;
-  }
+        //triggered by submit-button (nickname submit button)
+        function checkNickName() {
+            var nameInputField = document.getElementById('input_name');
+            var warningLabel = document.getElementById('nicknameWarningLabel');
+            var nickname = nameInputField.value.trim();
+            var usernameLabel = document.getElementById('usernameLabel');
+            //Nickname can include any character except spaces
+            if (nickname.length == 0) {
+                warningLabel.innerHTML = 'Nickname cannot be left empty !!!';
+                return;
+            } else if (nickname.includes(' ')) {
+                warningLabel.innerHTML = 'Nickname cannot contain spaces. Use _ instead';
+                return;
+            }
+            socket.emit('nicknameRequest', {
+                name: nickname
+            });
+            socket.on('nicknameAccepted', () => {
+                //dispose form (hide) and display (show) a new form to join/create room.
+                console.log('nickname Accepted');
+                var form2 = $('#form2');
+                $('#form1').remove();
+                form2.removeClass('hide');
+                form2.addClass('slideToPosAnim');
+                usernameLabel.innerHTML = "Your nickname : " + nickname;
+            });
+            socket.on('nicknameRejected', () => {
+                warningLabel.innerHTML = 'Nickname already in use.';
+            });
+        }
 
-  .slideInAnim{
-  -webkit-animation: slideInAnimation 2s 1 ease;
-  -moz-animation: slideInAnimation 2s 1 ease;
-  -o-animation: slideInAnimation 2s 1 ease;
-  }
-  @-webkit-keyframes slideInAnimation {
-  from { -webkit-transform: rotate(0deg) scale(0.1) skew(1deg) translate(10px); }
-  to { -webkit-transform: rotate(0deg) scale(1) skew(1deg) translate(0px); }
-  }
-  @-moz-keyframes slideInAnimation {
-  from { -moz-transform: rotate(0deg) scale(0.1) skew(1deg) translate(10px); }
-  to { -moz-transform: rotate(0deg) scale(1) skew(1deg) translate(0px); }
-  }
-  @-o-keyframes slideInAnimation {
-  from { -o-transform: rotate(0deg) scale(0.1) skew(1deg) translate(10px); }
-  to { -o-transform: rotate(0deg) scale(1) skew(1deg) translate(0px); }
-  }
+        function checkRoom() {
+            var roomNameField = document.getElementById("input_roomName");
+            var roomWarningLabel = document.getElementById("roomWarningLabel");
+            var roomName = roomNameField.value.trim();
+            if (roomName.length == 0) {
+                roomWarningLabel.innerHTML = "Enter Room name to join!!!";
+                return;
+            } else if (roomName.includes(' ')) {
+                roomWarningLabel.innerHTML = "Room name cannot contain spaces, use _ instead";
+                return;
+            }
+            socket.emit('roomJoinRequest', {
+                roomName: roomName
+            });
+            socket.on('roomJoinAccepted', function(roomData) {
+                roomWarningLabel.innerHTML = " ";
+                //          alert("joined into : "+roomData.roomName);
+            });
 
-  .slideToPosAnim {
-  -webkit-animation: slideToPosAnimation 2s 1 ease;
-  -moz-animation: slideToPosAnimation 2s 1 ease;
-  -o-animation: slideToPosAnimation 2s 1 ease;
-  }
-  @-webkit-keyframes slideToPosAnimation {
-   from { -webkit-transform: rotate(0deg) scale(0) skew(1deg) translate(-300px); }
-   to { -webkit-transform: rotate(0deg) scale(1) skew(1deg) translate(0px); }
-   }
-   @-moz-keyframes slideToPosAnimation {
-   from { -moz-transform: rotate(0deg) scale(0) skew(1deg) translate(-300px); }
-   to { -moz-transform: rotate(0deg) scale(1) skew(1deg) translate(0px); }
-   }
-   @-o-keyframes slideToPosAnimation {
-   from { -o-transform: rotate(0deg) scale(0) skew(1deg) translate(-300px); }
-   to { -o-transform: rotate(0deg) scale(1) skew(1deg) translate(0px); }
-  }
+            socket.on('roomJoinRejected', (message) => {
+                roomWarningLabel.innerHTML = message;
+            });
+        }
 
-  .center-container{
-    display : inline-block;
-    vertical-align: top;
-    padding-left : 20px;
-    padding-right: 20px;
-    padding-top : 20px;
-  }
-  .hide{
-    display : none;
-  }
-  </style>
+        function createRoom() {
+            var roomNameField = document.getElementById("input_roomName");
+            var roomWarningLabel = document.getElementById("roomWarningLabel");
+            var roomName = roomNameField.value.trim();
+            if (roomName.length == 0) {
+                roomWarningLabel.innerHTML = "Enter Room name to join!!!";
+                return;
+            } else if (roomName.includes(' ')) {
+                roomWarningLabel.innerHTML = "Room name cannot contain spaces, use _ instead";
+                return;
+            }
+            socket.emit("roomCreateRequest", {
+                roomName: roomName
+            });
+            socket.on("roomCreateAccepted", function() {
+                roomWarningLabel.innerHTML = " ";
+
+                var form2 = $("#form2");
+                form2.hide();
+                var form3 = $("#form3");
+                form3.removeClass("hide");
+                var roomDisplay = document.getElementById("roomDisplay");
+                roomDisplay.innerHTML = roomName;
+            });
+            socket.on("roomCreateRejected", function() {
+                roomWarningLabel.innerHTML = "Room name already in use, please choose different name.";
+            });
+        };
+
+    </script>
+    <style>
+        body {
+            font-family: 'Wendy One', sans-serif;
+            font-size: 36px;
+            line-height: 1.43;
+            background-color: black;
+            color: black;
+        }
+
+        .form-group {
+            margin-top: 3.3em;
+            padding: auto;
+            background-color: white;
+            border-style: solid;
+            border-width: 10px;
+            border-radius: 50px;
+            border-color: green;
+            width: 450px;
+            height: 8.5em;
+        }
+
+        .slideInAnim {
+            -webkit-animation: slideInAnimation 2s 1 ease;
+            -moz-animation: slideInAnimation 2s 1 ease;
+            -o-animation: slideInAnimation 2s 1 ease;
+        }
+
+        @-webkit-keyframes slideInAnimation {
+            from {
+                -webkit-transform: rotate(0deg) scale(0.1) skew(1deg) translate(10px);
+            }
+            to {
+                -webkit-transform: rotate(0deg) scale(1) skew(1deg) translate(0px);
+            }
+        }
+
+        @-moz-keyframes slideInAnimation {
+            from {
+                -moz-transform: rotate(0deg) scale(0.1) skew(1deg) translate(10px);
+            }
+            to {
+                -moz-transform: rotate(0deg) scale(1) skew(1deg) translate(0px);
+            }
+        }
+
+        @-o-keyframes slideInAnimation {
+            from {
+                -o-transform: rotate(0deg) scale(0.1) skew(1deg) translate(10px);
+            }
+            to {
+                -o-transform: rotate(0deg) scale(1) skew(1deg) translate(0px);
+            }
+        }
+
+        .slideToPosAnim {
+            -webkit-animation: slideToPosAnimation 2s 1 ease;
+            -moz-animation: slideToPosAnimation 2s 1 ease;
+            -o-animation: slideToPosAnimation 2s 1 ease;
+        }
+
+        @-webkit-keyframes slideToPosAnimation {
+            from {
+                -webkit-transform: rotate(0deg) scale(0) skew(1deg) translate(-300px);
+            }
+            to {
+                -webkit-transform: rotate(0deg) scale(1) skew(1deg) translate(0px);
+            }
+        }
+
+        @-moz-keyframes slideToPosAnimation {
+            from {
+                -moz-transform: rotate(0deg) scale(0) skew(1deg) translate(-300px);
+            }
+            to {
+                -moz-transform: rotate(0deg) scale(1) skew(1deg) translate(0px);
+            }
+        }
+
+        @-o-keyframes slideToPosAnimation {
+            from {
+                -o-transform: rotate(0deg) scale(0) skew(1deg) translate(-300px);
+            }
+            to {
+                -o-transform: rotate(0deg) scale(1) skew(1deg) translate(0px);
+            }
+        }
+
+        .center-container {
+            display: inline-block;
+            vertical-align: top;
+            padding-left: 20px;
+            padding-right: 20px;
+            padding-top: 20px;
+        }
+
+        .hide {
+            display: none;
+        }
+
+    </style>
 </head>
 
 <body>
-  <!-- overlays are dialogs for taking user nickname input -->
-  <div id="overlays" style="position:absolute; left:0; right:0; top:0; bottom:0; z-index: 200;">
-    <center>
-    <div id="userDetailPanel" class="center-container container-fluid">
-      <div role="form" novalidate="">
-        <div class="form-group slideInAnim" id='form1'>
-          <label style="color: rgb(150, 50, 200)">Guest Profile</label>
-          <input class="form-control" type="text" style="margin-top : 15px; margin-bottom: 15px; width:380px" placeholder="Enter Nickname" id="input_name">
-          <button type="button" class="btn btn-success" onclick="checkNickName()">Accept</button>
-          <p id="nicknameWarningLabel" style='font-size:12px; color:red'></p>
-        </div>
+    <!-- overlays are dialogs for taking user nickname input -->
+    <div id="overlays" style="position:absolute; left:0; right:0; top:0; bottom:0; z-index: 200;">
+        <center>
+            <div id="userDetailPanel" class="center-container container-fluid">
+                <div role="form" novalidate="">
+                    <div class="form-group slideInAnim" id='form1'>
+                        <label style="color: rgb(150, 50, 200)">Guest Profile</label>
+                        <input class="form-control" type="text" style="margin-top : 15px; margin-bottom: 15px; width:380px" placeholder="Enter Nickname" id="input_name">
+                        <button type="button" class="btn btn-success" onclick="checkNickName()">Accept</button>
+                        <p id="nicknameWarningLabel" style='font-size:12px; color:red'></p>
+                    </div>
 
-        <!-- hidden by default-->
-        <div class="form-group hide" id='form2'>
-          <label style="color:rgb(200, 100, 150)">RGBNinja</label>
-          <p id="usernameLabel" style="font-size:12px; color:green"></p>
-          <input class='form-control' type='text' style="margin-top : 15px; margin-bottom: 15px; width:380px" placeholder="Room Name..." id="input_roomName">
-          <button type="button" class="btn btn-success" onclick="checkRoom()"> Join </button>
-          <button type="button" class="btn btn-warning" onclick="createRoom()"> Create Room </button>
-          <p id="roomWarningLabel" style='font-size:12px; color:red'></p>
-        </div>
-        
-        <div id="form3" class="form-group hide">
-            <p>Room name :  <span id="roomDisplay"></span> <br>Share the name with opponent.</p>
-            <p>User matched : <span id="userJoined">1</span>/2</p>
-        </div>
-        
-        <div id="instructionForm" class="form-group hide">
-            <p><center>Instructions</center></p><br>
-            <p style="font-size: 16px">Use the sliders to increase value of <br> primary colors, you cannot however <br> decrease the RGB (Red,Green,Blue) amount</p>
-        </div>
-      </div>
+                    <!-- hidden by default-->
+                    <div class="form-group hide" id='form2'>
+                        <label style="color:rgb(200, 100, 150)">RGBNinja</label>
+                        <p id="usernameLabel" style="font-size:12px; color:green"></p>
+                        <input class='form-control' type='text' style="margin-top : 15px; margin-bottom: 15px; width:380px" placeholder="Room Name..." id="input_roomName">
+                        <button type="button" class="btn btn-success" onclick="checkRoom()"> Join </button>
+                        <button type="button" class="btn btn-warning" onclick="createRoom()"> Create Room </button>
+                        <p id="roomWarningLabel" style='font-size:12px; color:red'></p>
+                    </div>
+
+                    <div id="form3" class="form-group hide">
+                        <p>Room name : <span id="roomDisplay"></span> <br>Share the name with opponent.</p>
+                        <p>User matched : <span id="userJoined">1</span>/2</p>
+                    </div>
+
+                    <div id="instructionForm" class="form-group hide">
+                        <p>
+                            <center>Instructions</center>
+                        </p><br>
+                        <p style="font-size: 16px">Use the sliders to increase value of <br> primary colors, you cannot however <br> decrease the RGB (Red,Green,Blue) amount</p>
+                    </div>
+                </div>
+            </div>
+        </center>
     </div>
-    </center>
-  </div>
-  <!-- end of overlays -->
+    <!-- end of overlays -->
 
-  <div id="game">
-  </div>
+    <div id="game">
+    </div>
 
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
-  
-  <script src="/js/game.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+
+    <script src="/js/game.js"></script>
 
 </body>
+
 </html>
