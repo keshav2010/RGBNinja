@@ -14,18 +14,24 @@
     <script>
         //connect to localhost
         var socket = io.connect();
+        
         //signal is recieved by each client of room
         socket.on("gameBegin", function() {
             var form2 = $("#form2");
-            form2.hide();
+            form2.addClass("hide");
             var form3 = $("#form3");
-            form3.hide();
+            form3.addClass("hide");
             var instructionForm = $("#instructionForm");
             instructionForm.removeClass("hide");
             instructionForm.addClass('slideToPosAnim');
             setTimeout(function(){
+                //informs server to emit 'startGameState' event
+                //note : socket.on("launchGameState") not working on client side
+                //so we pass the event to server, which ping back client 
+                //again to start game state
                 socket.emit("launchGameState");
                 console.log("launched gamestate emitted");
+                instructionForm.addClass("hide");
             }, 5000);
         });
         //triggered by submit-button (nickname submit button)
@@ -101,7 +107,7 @@
                 roomWarningLabel.innerHTML = " ";
 
                 var form2 = $("#form2");
-                form2.hide();
+                form2.addClass("hide");
                 var form3 = $("#form3");
                 form3.removeClass("hide");
                 var roomDisplay = document.getElementById("roomDisplay");

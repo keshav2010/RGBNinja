@@ -1,8 +1,3 @@
-/*  TEXT EDITOR : BRACKETS (identation issues if working with different TEXTEDITORS)
-  Name Convention to follow
-    > all the helper function arguments should begin with _  (example : _name, _arg)
-    > function name should be like functionName() instead of function_Name(), with the first character must not be capitalized
-*/
 var socketio = require('socket.io');
 var io;
 
@@ -44,6 +39,10 @@ exports.listen = function(server)
             }
             else socket.emit('roomCreateRejected');
         });
+        
+        socket.on("launchGameState", ()=>{
+            socket.emit("startGameState");
+        })
         
         // join room if it exist
         socket.on('roomJoinRequest', function(roomData){

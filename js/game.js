@@ -21,6 +21,7 @@ var game = new Phaser.Game(1024, 768, Phaser.CANVAS, '',
   },
   preload : function()
   {
+    alert("alert works"); 
     console.log('game>preload');
     this.state.add('Game', Game);
     this.state.add('GameOver', GameOver);
@@ -33,12 +34,10 @@ var game = new Phaser.Game(1024, 768, Phaser.CANVAS, '',
     this.game.stage.backgroundColor = "rgb("+getRand(50, 150)+","+getRand(0, 60)+","+getRand(100, 200)+")";
     this.loginText = game.add.bitmapText(this.game.world.centerX - 200, 25, 'loginTitle', 'RGB\nNinja', 72);
     this.loginText.text = 'rgb ninja';
-    console.log("socket is : "+socket.id);
-    
+    console.log("gamejs > game > create > socket is : "+socket.id);
     //error ; this is never triggered, socket.on() doesn't work
-    socket.on("launchGameState", ()=>{
-        console.log("launchedd bitchess");
-        alert("launching game state"); 
+    socket.on("startGameState", ()=>{
+        game.state.start('Game');
     });
   }
 });
