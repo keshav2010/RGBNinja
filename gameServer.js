@@ -9,6 +9,7 @@ var usedRoomNames = {}; //maps roomName to number(number of clients in the room)
 
 var currentRoom = {}; //maps socketID to roomName
 
+
 exports.listen = function (server) {
     io = socketio.listen(server);
 

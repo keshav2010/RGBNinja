@@ -11,12 +11,13 @@
     <!-- exposes io global -->
     <script src="/socket.io/socket.io.js"></script>
     <script src="//cdn.jsdelivr.net/npm/phaser-ce@2.11.0/build/phaser.js"></script>
+    <script src="/js/client.js"></script>
     <script>
         //connect to localhost
-        var socket = io.connect();
+        //var socket = io.connect();
         
         //signal is recieved by each client of room
-        socket.on("gameBegin", function() {
+        Client.socket.on("gameBegin", function() {
             var form2 = $("#form2");
             form2.addClass("hide");
             var form3 = $("#form3");
@@ -29,7 +30,7 @@
                 //note : socket.on("launchGameState") not working on client side
                 //so we pass the event to server, which ping back client 
                 //again to start game state
-                socket.emit("launchGameState");
+                Client.socket.emit("launchGameState");
                 console.log("launched gamestate emitted");
                 instructionForm.addClass("hide");
             }, 5000);
@@ -48,10 +49,10 @@
                 warningLabel.innerHTML = 'Nickname cannot contain spaces. Use _ instead';
                 return;
             }
-            socket.emit('nicknameRequest', {
+            Client.socket.emit('nicknameRequest', {
                 name: nickname
             });
-            socket.on('nicknameAccepted', () => {
+            Client.socket.on('nicknameAccepted', () => {
                 //dispose form (hide) and display (show) a new form to join/create room.
                 console.log('nickname Accepted');
                 var form2 = $('#form2');
@@ -60,7 +61,7 @@
                 form2.addClass('slideToPosAnim');
                 usernameLabel.innerHTML = "Your nickname : " + nickname;
             });
-            socket.on('nicknameRejected', () => {
+            Client.socket.on('nicknameRejected', () => {
                 warningLabel.innerHTML = 'Nickname already in use.';
             });
         }
@@ -76,15 +77,15 @@
                 roomWarningLabel.innerHTML = "Room name cannot contain spaces, use _ instead";
                 return;
             }
-            socket.emit('roomJoinRequest', {
+            Client.socket.emit('roomJoinRequest', {
                 roomName: roomName
             });
-            socket.on('roomJoinAccepted', function(roomData) {
+            Client.socket.on('roomJoinAccepted', function(roomData) {
                 roomWarningLabel.innerHTML = " ";
                 //          alert("joined into : "+roomData.roomName);
             });
 
-            socket.on('roomJoinRejected', (message) => {
+            Client.socket.on('roomJoinRejected', (message) => {
                 roomWarningLabel.innerHTML = message;
             });
         }
@@ -100,10 +101,10 @@
                 roomWarningLabel.innerHTML = "Room name cannot contain spaces, use _ instead";
                 return;
             }
-            socket.emit("roomCreateRequest", {
+            Client.socket.emit("roomCreateRequest", {
                 roomName: roomName
             });
-            socket.on("roomCreateAccepted", function() {
+            Client.socket.on("roomCreateAccepted", function() {
                 roomWarningLabel.innerHTML = " ";
 
                 var form2 = $("#form2");
@@ -113,7 +114,7 @@
                 var roomDisplay = document.getElementById("roomDisplay");
                 roomDisplay.innerHTML = roomName;
             });
-            socket.on("roomCreateRejected", function() {
+            Client.socket.on("roomCreateRejected", function() {
                 roomWarningLabel.innerHTML = "Room name already in use, please choose different name.";
             });
         };

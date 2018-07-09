@@ -6,14 +6,16 @@ Use : http://kvazars.com/littera/ to generate bitmap font's xml file (.fnt / xml
 */
 var playerName;
 var roomName;
-var game = new Phaser.Game(1024, 768, Phaser.CANVAS, '',
+const VIEW_WIDTH = 1024;
+const VIEW_HEIGHT = 768;
+var game = new Phaser.Game(VIEW_WIDTH, VIEW_HEIGHT, Phaser.CANVAS, '',
 {
   init: function(){
-    console.log("game>init for socket "+socket.id);
+    console.log("game>init for socket "+Client.socket.id);
     //basic configuration
     this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-    this.scale.maxWidth = 1024;
-    this.scale.maxHeight = 768;
+    this.scale.maxWidth = VIEW_WIDTH;
+    this.scale.maxHeight = VIEW_HEIGHT;
     this.scale.pageAlignHorizontally = true;    
     this.scale.pageAlignVertically = true;
     this.scale.updateLayout();
@@ -34,32 +36,42 @@ var game = new Phaser.Game(1024, 768, Phaser.CANVAS, '',
     this.game.stage.backgroundColor = "rgb("+getRand(50, 150)+","+getRand(0, 60)+","+getRand(100, 200)+")";
     this.loginText = game.add.bitmapText(this.game.world.centerX - 200, 25, 'loginTitle', 'RGB\nNinja', 72);
     this.loginText.text = 'rgb ninja';
-    console.log("gamejs > game > create > socket is : "+socket.id);
+    console.log("gamejs > game > create > socket is : "+Client.socket.id);
     //error ; this is never triggered, socket.on() doesn't work
-    socket.on("startGameState", ()=>{
+    Client.socket.on("startGameState", ()=>{
         game.state.start('Game');
     });
   }
 });
-//game
 
+
+//Main Level goes here, where actual gameplay takes place
 class Game extends Phaser.State
 {
     preload()
     {
-        console.log("game>preload");
+        console.log("game>preload");        
+        this.centerRGBDisplay = {
+            displayWidth : 100, 
+            displayHeight : 100, 
+            posX : (VIEW_WIDTH/2) - (displayWidth/2),
+            posY : 100
+        };
+
     }
     create()
     {
         console.log("game>create");
         this.game.stage.backgroundColor = "rgb(0, 0, 0)";
-        console.log("game>create>socet id : "+socket.id);
+        console.log("game>create>socet id : "+Client.socket.id);
     }
     update()
     {
         console.log("game>update");
     }
 }
+
+//the final screen
 class GameOver extends Phaser.State
 {
   preload()
@@ -76,7 +88,8 @@ class GameOver extends Phaser.State
   }
 }
 
-//helper method
+
+//helper methods
 const getRand = function(low, high){
   return Math.floor((Math.random() * high) + low);
 }
