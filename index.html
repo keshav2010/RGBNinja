@@ -13,8 +13,6 @@
     <script src="//cdn.jsdelivr.net/npm/phaser-ce@2.11.0/build/phaser.js"></script>
     <script src="/js/client.js"></script>
     <script>
-        //connect to localhost
-        //var socket = io.connect();
         
         //signal is recieved by each client of room
         Client.socket.on("gameBegin", function() {
@@ -25,14 +23,9 @@
             var instructionForm = $("#instructionForm");
             instructionForm.removeClass("hide");
             instructionForm.addClass('slideToPosAnim');
-            setTimeout(function(){
-                //informs server to emit 'startGameState' event
-                //note : socket.on("launchGameState") not working on client side
-                //so we pass the event to server, which ping back client 
-                //again to start game state
-                Client.socket.emit("launchGameState");
-                console.log("launched gamestate emitted");
-                instructionForm.addClass("hide");
+            setTimeout(()=>{
+                instructionForm.addClass('hide');
+                Client.launchGame();
             }, 5000);
         });
         //triggered by submit-button (nickname submit button)
@@ -82,7 +75,6 @@
             });
             Client.socket.on('roomJoinAccepted', function(roomData) {
                 roomWarningLabel.innerHTML = " ";
-                //          alert("joined into : "+roomData.roomName);
             });
 
             Client.socket.on('roomJoinRejected', (message) => {

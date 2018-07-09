@@ -36,8 +36,9 @@ exports.listen = function (server) {
             } else socket.emit('roomCreateRejected');
         });
 
-        socket.on("launchGameState", () => {
-            socket.emit("startGameState");
+        socket.on('startGame', () => {
+            //starts the game by sending data to all clients connected 
+            socket.emit('startGameState');
         })
 
         // join room if it exist
@@ -51,8 +52,7 @@ exports.listen = function (server) {
                 socket.emit('roomJoinRejected', "Sorry, Room is already full.");
             else {
                 joinRoom(socket, roomData.roomName);
-                socket.emit('roomJoinAccepted');
-
+                
                 //see index.html for on('gameBegin')
                 //emit gameBegin signal for all connected sockets of given room
                 io.to(roomData.roomName).emit('gameBegin');

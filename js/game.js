@@ -4,8 +4,7 @@ in order to use it for browser side, we need to use browserify or other third pa
 for avoiding learning so many libraries
 Use : http://kvazars.com/littera/ to generate bitmap font's xml file (.fnt / xml)
 */
-var playerName;
-var roomName;
+
 const VIEW_WIDTH = 1024;
 const VIEW_HEIGHT = 768;
 var game = new Phaser.Game(VIEW_WIDTH, VIEW_HEIGHT, Phaser.CANVAS, '',
