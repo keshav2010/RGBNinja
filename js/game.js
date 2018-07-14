@@ -49,13 +49,7 @@ class Game extends Phaser.State
 {
     preload()
     {
-        console.log("game>preload");        
-        this.centerRGBDisplay = {
-            displayWidth : 100, 
-            displayHeight : 100, 
-            posX : (VIEW_WIDTH/2) - (displayWidth/2),
-            posY : 100
-        };
+        console.log("game>preload");
 
     }
     create()

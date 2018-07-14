@@ -1,15 +1,77 @@
 var socketio = require('socket.io');
 var io;
 
-var usedNames = {}; //maps name to socket.id
-var userName = {}; //maps socket.id to name 
+var activeRooms = {}; //maps room name to roomObject 
+var activeClients= {};//maps username to user object
 
-var usedRoomNames = {}; //maps roomName to number(number of clients in the room), this variable might need not to store number of clients 
 //as value since socketio probably have build in method/properties to check for that
 
-var currentRoom = {}; //maps socketID to roomName
-
-
+var usersMap = {}; //maps socketid to user object
+/*
+constructor method :
+*/
+function GameRoom(_roomName)
+{
+    this.roomName = _roomName;
+    this.RGBValue = [];
+    this.connectedUsers = {}; //map username to User object
+    this.playerCount = 0;
+    
+    //this method should never be called directly
+    this.addNewUser = function( _userObject){
+        user = _userObject;
+        if(this.playerCount == 2)
+        {
+            return false;
+        }
+        
+        this.connectedUsers[ user.userName] = user;
+        this.playerCount = this.connectedUsers.length;
+        return true;
+    }
+    //this method should never be called directly
+    this.removeUser = function( _userName){
+        if(this.connectedUsers[ _userName] == undefined || this.connectedUsers.length == 0)
+            return false;
+        delete this.connectedUsers[ _userName]; //removes only the property, doesn't free up memory
+        this.playerCount = this.connectedUsers.length;
+        return true;
+    }
+    
+    this.getUser = function( _userName){
+        return this.connectedUsers[ _userName];
+    }
+    
+    return this;
+}
+function User(_userName, _socket)
+{
+    this.serverSideSocket = _socket;
+    this.userName = _userName;
+    this.currentRoom = undefined;
+    
+    this.addToRoom = function( _roomObject){ 
+        this.leaveCurrentRoom();
+        this.currentRoom = _roomObject;
+        this.currentRoom.addNewUser( this);
+        this.serverSideSocket.join( _roomObject.roomName);
+    };
+    this.leaveCurrentRoom = function(){
+        
+        if(this.currentRoom == undefined)
+            return;
+        
+        this.currentRoom.removeUser( _userName);
+        
+        this.serverSideSocket.leave( this.currentRoom.roomName);
+        
+        //clear room if no user in it
+        if( activeRooms[ this.currentRoom.roomName].playerCount == 0){
+            delete activeRooms[ _roomName];
+        }
+        this.currentRoom = undefined;
+    };
+}
 exports.listen = function (server) {
     io = socketio.listen(server);
 
@@ -19,97 +81,110 @@ exports.listen = function (server) {
         //emitted by nickname dialog, responsible for checking nickname availibity
         socket.on('nicknameRequest', function (nicknameData) {
             if (clientNameAvailable(nicknameData.name)) {
-                //mark as used
-                usedNames[nicknameData.name] = socket.id;
+
+                //added new property to socket object to avoid making new global map 
+                socket.clientName = nicknameData.name;
+                
+                activeClients[nicknameData.name] = new User( nicknameData.name, socket);
+                
                 socket.emit('nicknameAccepted');
             } else {
                 socket.emit('nicknameRejected');
             }
         });
 
-        // creating new room if it doesn't exist
-        socket.on("roomCreateRequest", function (roomData) {
+        //creating new room if it doesn't exist
+        socket.on("roomCreateRequest", function (requestData) {
             //if room name is available for use
-            if (roomNameAvailable(roomData.roomName)) {
+            if (roomNameAvailable(requestData.roomName)) {
                 socket.emit("roomCreateAccepted");
-                joinRoom(socket, roomData.roomName);
-            } else socket.emit('roomCreateRejected');
+                activeRooms[requestData.roomName] = new GameRoom( requestData.roomName);
+                activeClients[requestData.userName].addToRoom( activeRooms[requestData.roomName]);
+            } 
+            else socket.emit('roomCreateRejected');
         });
 
         socket.on('startGame', () => {
-            //starts the game by sending data to all clients connected 
-            socket.emit('startGameState');
+            //starts the game by sending data to all clients connected
+            //as well as generating target rgb which is same for both clients
+            io.to(roomData.roomName).emit('startGameState');
         })
 
         // join room if it exist
-        socket.on('roomJoinRequest', function (roomData) {
-
-            //if roomName is not used implies room doesn't exist
-            if (usedRoomNames[roomData.roomName] == undefined)
-                socket.emit('roomJoinRejected', "Sorry, No such room exist.");
-            //else if room exist and is full
-            else if (usedRoomNames[roomData.roomName] > 1)
-                socket.emit('roomJoinRejected', "Sorry, Room is already full.");
-            else {
-                joinRoom(socket, roomData.roomName);
-                
-                //see index.html for on('gameBegin')
-                //emit gameBegin signal for all connected sockets of given room
-                io.to(roomData.roomName).emit('gameBegin');
-            }
+        socket.on('roomJoinRequest', function (requestData) {
+            var username = requestData.userName;
+            var roomname = requestData.roomName;
+            joinRoom(username, roomname, socket);
         });
 
         socket.on('disconnect', function () {
             console.log("disconnect socket : " + socket.id);
             leaveRoom(socket);
-            delete usedNames[userName[socket.id]];
-            delete userName[socket.id];
+            delete activeClients[socket.clientName];
         });
     });
 };
 
 //helper method : returns true if _name is not used otherwise false
 function clientNameAvailable(_name) {
-    if (usedNames[_name] == undefined)
+    if(activeClients[_name] == undefined)
         return true;
     return false;
 }
 //helper method : returns true if roomName is available to use for creating new room
 function roomNameAvailable(_roomName) {
-    if (usedRoomNames[_roomName] == undefined)
+    if (activeRooms[_roomName] == undefined)
         return true;
     return false;
 }
 
-function joinRoom(_socket, _roomName) {
-    //if user is already in a room, leave it before joining a new one
-    leaveRoom(_socket);
 
-    //this is true when creating room
-    if (usedRoomNames[_roomName] == undefined)
-        usedRoomNames[_roomName] = 0;
+/*
+helper method : joins given user (given as name) to given room (given as name)
+parameters : 
+    _userName : name of user who wish to join the room
+    _roomName : name of room to join
 
-    //join new room and update corresponding variables
-    _socket.join(_roomName);
-    currentRoom[_socket.id] = _roomName;
-    usedRoomNames[_roomName] += 1;
+removes user from any existing room
+*/
+function joinRoom(_userName, _roomName, _socket) {
+    
+    //if roomName is not used implies room doesn't exist
+    if(activeRooms[_roomName] == undefined)
+        _socket.emit('roomJoinRejected', "Sorry, No such room exist.");
+    
+    //else if room exist and is full
+    else if (activeRooms[_roomName].playerCount > 1)
+        _socket.emit('roomJoinRejected', "Sorry, Room is already full.");
+    
+    //otherwise join room
+    else {
+        //makes sure given user leaves any room to which it belongs 
+        //before joining a new room
+        leaveRoom(_socket);
 
-    _socket.emit('roomJoinAccepted', {
-        room: _roomName
-    });
+        //user joins the room
+        activeClients[_userName].addToRoom( activeRooms[ _roomName]);
+
+        _socket.emit('roomJoinAccepted', {
+            room: _roomName
+        });
+    }
 }
 
 
 function leaveRoom(_socket) {
-    //if no room to leave, return
-    if (currentRoom[_socket.id] == undefined)
+    if( _socket.clientName == undefined){
+        console.log("leaveRoom > socket clientName not defined");
         return;
-
-    _socket.leave(currentRoom[_socket.id]);
-
-    usedRoomNames[currentRoom[_socket.id]] -= 1;
-    if (usedRoomNames[currentRoom[_socket.id]] <= 0) {
-        delete usedRoomNames[currentRoom[_socket.id]]; //mark room name as available
     }
-    delete currentRoom[_socket.id];
+    else if( activeClients[_socket.clientName] == undefined)
+        {
+            console.log("leaveRoom > no such client, ERROR, This should never be printed");
+            return;
+        }
+    activeClients[ _socket.clientName].leaveCurrentRoom();
+}
+const getRand = function(low, high){
+  return Math.floor((Math.random() * high) + low);
 }
