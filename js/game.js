@@ -7,6 +7,7 @@ Use : http://kvazars.com/littera/ to generate bitmap font's xml file (.fnt / xml
 
 const VIEW_WIDTH = 1024;
 const VIEW_HEIGHT = 768;
+var target;
 var game = new Phaser.Game(VIEW_WIDTH, VIEW_HEIGHT, Phaser.CANVAS, '',
 {
   init: function(){
@@ -22,7 +23,6 @@ var game = new Phaser.Game(VIEW_WIDTH, VIEW_HEIGHT, Phaser.CANVAS, '',
   },
   preload : function()
   {
-    alert("alert works"); 
     console.log('game>preload');
     this.state.add('Game', Game);
     this.state.add('GameOver', GameOver);
@@ -38,18 +38,19 @@ var game = new Phaser.Game(VIEW_WIDTH, VIEW_HEIGHT, Phaser.CANVAS, '',
     console.log("gamejs > game > create > socket is : "+Client.socket.id);
     //error ; this is never triggered, socket.on() doesn't work
     Client.socket.on("startGame", function(targetRGBValue){
-        game.state.start('Game', true, false, targetRGBValue);              
+        target = targetRGBValue;
+        game.state.start('Game');              
     });
   }
 });
 
 
 //Main Level goes here, where actual gameplay takes place
+var targetRGBDisplay;
 class Game extends Phaser.State
 {
     init( targetRGBValue )
     {
-        this.target = targetRGBValue;
     }
     preload()
     {
@@ -58,12 +59,27 @@ class Game extends Phaser.State
     create()
     {
         console.log("game>create");
-        this.game.stage.backgroundColor = "rgb("+target.r+","+ target.g+","+ target.b+")";
+        this.game.stage.backgroundColor = "rgb(250,250,250)";
+         var graphics = this.game.add.graphics(0, 0);
+
+        console.log("color : "+ fullColorHex(target.r, target.g, target.b));
+        
+        //draw a line for seperation
+        graphics.lineStyle(20, 0x33FF00);
+        graphics.moveTo(VIEW_WIDTH/2,0);
+        graphics.lineTo(VIEW_WIDTH/2, VIEW_HEIGHT);
+        
+        //draw circle to display the target rgb to acheive 
+        graphics.beginFill(fullColorHex(target.r, target.b, target.g), 1);
+        graphics.drawCircle(VIEW_WIDTH/2,125, 200);
+        graphics.endFill();
+        
         console.log("game>create>socet id : "+Client.socket.id);
+        
     }
     update()
     {
-        console.log("game>update");
+        
     }
 }
 
@@ -84,8 +100,20 @@ class GameOver extends Phaser.State
   }
 }
 
-
 //helper methods
 const getRand = function(low, high){
   return Math.floor((Math.random() * high) + low);
+}
+var rgbToHex = function (rgb) { 
+  var hex = Number(rgb).toString(16);
+  if (hex.length < 2) {
+       hex = "0" + hex;
+  }
+  return hex;
+}
+var fullColorHex = function(r,g,b) {   
+  var red = rgbToHex(r);
+  var green = rgbToHex(g);
+  var blue = rgbToHex(b);
+  return parseInt(red+green+blue, 16);
 }
