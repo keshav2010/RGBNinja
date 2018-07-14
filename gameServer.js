@@ -97,9 +97,9 @@ exports.listen = function (server) {
         socket.on("roomCreateRequest", function (requestData) {
             //if room name is available for use
             if (roomNameAvailable(requestData.roomName)) {
-                socket.emit("roomCreateAccepted");
                 activeRooms[requestData.roomName] = new GameRoom( requestData.roomName);
                 activeClients[requestData.userName].addToRoom( activeRooms[requestData.roomName]);
+                socket.emit("roomCreateAccepted");
             } 
             else socket.emit('roomCreateRejected');
         });
@@ -115,6 +115,7 @@ exports.listen = function (server) {
             var username = requestData.userName;
             var roomname = requestData.roomName;
             joinRoom(username, roomname, socket);
+            if(activeRooms[ roomname])
         });
 
         socket.on('disconnect', function () {
@@ -149,27 +150,27 @@ removes user from any existing room
 */
 function joinRoom(_userName, _roomName, _socket) {
     
-    //if roomName is not used implies room doesn't exist
-    if(activeRooms[_roomName] == undefined)
+    if(activeRooms[_roomName] == undefined){
         _socket.emit('roomJoinRejected', "Sorry, No such room exist.");
-    
-    //else if room exist and is full
-    else if (activeRooms[_roomName].playerCount > 1)
-        _socket.emit('roomJoinRejected', "Sorry, Room is already full.");
-    
-    //otherwise join room
-    else {
-        //makes sure given user leaves any room to which it belongs 
-        //before joining a new room
-        leaveRoom(_socket);
-
-        //user joins the room
-        activeClients[_userName].addToRoom( activeRooms[ _roomName]);
-
-        _socket.emit('roomJoinAccepted', {
-            room: _roomName
-        });
+        return false;
     }
+    //else if room exist and is full
+    else if (activeRooms[_roomName].playerCount > 1){
+        _socket.emit('roomJoinRejected', "Sorry, Room is already full.");
+        return false;
+    }
+    
+    //makes sure given user leaves any room to which it belongs 
+    //before joining a new room
+    leaveRoom(_socket);
+
+    //user joins the room
+    activeClients[_userName].addToRoom( activeRooms[ _roomName]);
+
+    _socket.emit('roomJoinAccepted', {
+        room: _roomName
+    });
+    return true;
 }
 
 
