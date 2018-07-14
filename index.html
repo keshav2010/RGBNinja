@@ -15,7 +15,7 @@
     <script>
         
         //signal is recieved by each client of room
-        Client.socket.on("gameBegin", function() {
+        Client.socket.on("gameReady", function(targetRGB) {
             var form2 = $("#form2");
             form2.addClass("hide");
             var form3 = $("#form3");
@@ -25,9 +25,10 @@
             instructionForm.addClass('slideToPosAnim');
             setTimeout(()=>{
                 instructionForm.addClass('hide');
-                Client.launchGame();
+                Client.launchGame(targetRGB);
             }, 5000);
         });
+        
         //triggered by submit-button (nickname submit button)
         function checkNickName() {
             var nameInputField = document.getElementById('input_name');

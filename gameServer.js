@@ -12,9 +12,18 @@ constructor method :
 function GameRoom(_roomName)
 {
     this.roomName = _roomName;
-    this.RGBValue = [];
+    this.RGBValue = [0, 0, 0];
     this.connectedUsers = new Map(); //map username to User object
     this.playerCount = 0;
+    
+    this.generateRGBValue = function(){
+        this.RGBValue[0] = getRand(10, 200);
+        this.RGBValue[1] = getRand(15, 200);
+        this.RGBValue[2] = getRand(10, 250);
+    }
+    this.getRGB = function(){
+        return this.RGBValue;
+    }
     
     //this method should never be called directly
     this.addNewUser = function( _userObject){
@@ -119,9 +128,26 @@ exports.listen = function (server) {
         socket.on('roomJoinRequest', function (requestData) {
             var username = requestData.userName;
             var roomname = requestData.roomName;
-            joinRoom(username, roomname, socket);
+            if(joinRoom(username, roomname, socket)){
+                if(activeRooms.get( roomname).playerCount == 2)
+                {
+                    //setup game by generating target RGBValues for room
+                    activeRooms.get(roomname).generateRGBValue();
+                    
+                    //signals all connected clients in a room to get ready 
+                    //and supplies same target value to each client to setup display
+                    io.to(roomname).emit('gameReady', {
+                        r : activeRooms.get(roomname).getRGB()[0],
+                        g : activeRooms.get(roomname).getRGB()[1],
+                        b : activeRooms.get(roomname).getRGB()[2]
+                    });
+                }
+            }
+            
         });
-
+        socket.on("requestGameStart", function(targetRGBValue){
+           socket.emit('startGame', targetRGBValue); 
+        });
         socket.on('disconnect', function () {
             console.log("disconnect socket : " + socket.id);
             leaveRoom(socket);
@@ -157,25 +183,28 @@ function joinRoom(_userName, _roomName, _socket) {
     if(activeRooms.get(_roomName) == undefined){
         console.log('no such room found active : '+_roomName);
         _socket.emit('roomJoinRejected', "Sorry, No such room exist.");
+        return false;
     }
     //else if room exist and is full
     else if (activeRooms.get(_roomName).playerCount > 1){
         console.log('room '+ _roomName+' is full');
         _socket.emit('roomJoinRejected', "Sorry, Room is already full.");
+        return false;
     }
     //otherwise join room
-    else {
-        //makes sure given user leaves any room to which it belongs 
-        //before joining a new room
-        leaveRoom(_socket);
+    
+    //makes sure given user leaves any room to which it belongs 
+    //before joining a new room
+    leaveRoom(_socket);
 
-        //user joins the room
-        activeClients.get(_userName).addToRoom( activeRooms.get(_roomName));
-        console.log("players : " + activeRooms.get(_roomName).playerCount);
-        _socket.emit('roomJoinAccepted', {
-            room: _roomName
-        });
-    }
+    //user joins the room
+    activeClients.get(_userName).addToRoom( activeRooms.get(_roomName));
+    console.log("players : " + activeRooms.get(_roomName).playerCount);
+    _socket.emit('roomJoinAccepted', {
+        room: _roomName
+    });
+    return true;
+
 }
 
 

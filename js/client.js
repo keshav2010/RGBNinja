@@ -6,8 +6,8 @@ var Client = {
     socket: io.connect()
 };
 
-Client.launchGame = function()
+Client.launchGame = function(targetRGB)
 {
     //signals server to begin game
-    Client.socket.emit("startGame");
+    Client.socket.emit("requestGameStart", targetRGB);
 }

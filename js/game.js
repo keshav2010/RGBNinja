@@ -37,8 +37,8 @@ var game = new Phaser.Game(VIEW_WIDTH, VIEW_HEIGHT, Phaser.CANVAS, '',
     this.loginText.text = 'rgb ninja';
     console.log("gamejs > game > create > socket is : "+Client.socket.id);
     //error ; this is never triggered, socket.on() doesn't work
-    Client.socket.on("startGameState", ()=>{
-        game.state.start('Game');
+    Client.socket.on("startGame", function(targetRGBValue){
+        game.state.start('Game', true, false, targetRGBValue);              
     });
   }
 });
@@ -47,15 +47,18 @@ var game = new Phaser.Game(VIEW_WIDTH, VIEW_HEIGHT, Phaser.CANVAS, '',
 //Main Level goes here, where actual gameplay takes place
 class Game extends Phaser.State
 {
+    init( targetRGBValue )
+    {
+        this.target = targetRGBValue;
+    }
     preload()
     {
         console.log("game>preload");
-
     }
     create()
     {
         console.log("game>create");
-        this.game.stage.backgroundColor = "rgb(0, 0, 0)";
+        this.game.stage.backgroundColor = "rgb("+target.r+","+ target.g+","+ target.b+")";
         console.log("game>create>socet id : "+Client.socket.id);
     }
     update()
