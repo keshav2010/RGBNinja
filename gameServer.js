@@ -66,7 +66,14 @@ function User(_userName, _socket)
     this.serverSideSocket = _socket;
     this.userName = _userName;
     this.currentRoom = undefined;
-    
+    this.RGBValues = [0, 0, 0];
+    this.updateRGB = function(index)
+    {
+        this.RGBValues[index] += 1;
+    };
+    this.getRGBValues = function(){
+      return this.RGBValues;  
+    };
     this.addToRoom = function( _roomObject){ 
         this.leaveCurrentRoom();
         this.currentRoom = _roomObject;
@@ -145,6 +152,38 @@ exports.listen = function (server) {
             }
             
         });
+        
+        socket.on('input', (keyString)=>{
+            if(keyString === 'red')
+             {
+                activeClients.get(socket.clientName).updateRGB(0);
+                socket.broadcast.to(activeClients.get(socket.clientName).currentRoom.roomName).emit('opponentAction', activeClients.get(socket.clientName).getRGBValues());
+                 
+                  //inform emitter about its own color on server
+                socket.emit('clientAction', activeClients.get(socket.clientName).getRGBValues());
+             }
+            else if(keyString === 'green')
+             {
+                activeClients.get(socket.clientName).updateRGB(1);
+                
+                //inform other users about opponent display
+                socket.broadcast.to(activeClients.get(socket.clientName).currentRoom.roomName).emit('opponentAction', activeClients.get(socket.clientName).getRGBValues());
+                 
+                //inform emitter about its own color on server
+                socket.emit('clientAction', activeClients.get(socket.clientName).getRGBValues());
+             }
+            else if(keyString === 'blue')
+             {
+                activeClients.get(socket.clientName).updateRGB(2);
+                 //inform other users about opponent display
+                socket.broadcast.to(activeClients.get(socket.clientName).currentRoom.roomName).emit('opponentAction', activeClients.get(socket.clientName).getRGBValues());
+                 
+                  //inform emitter about its own color on server
+                socket.emit('clientAction', activeClients.get(socket.clientName).getRGBValues());
+             }
+        
+        });
+       
         socket.on("requestGameStart", function(targetRGBValue){
            socket.emit('startGame', targetRGBValue); 
         });

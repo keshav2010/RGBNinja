@@ -48,16 +48,17 @@ var game = new Phaser.Game(VIEW_WIDTH, VIEW_HEIGHT, Phaser.CANVAS, '',
 //Main Level goes here, where actual gameplay takes place
 var targetRGBDisplay;
 var btnRed,btnGreen, btnBlue;
+var redKey, blueKey, greenKey;
+var gameReference;
 class Game extends Phaser.State
 {
     init( targetRGBValue )
     {
-    }
-    preload()
-    {
-        console.log("game>preload");
+        gameReference = this;
         this.gfx = this.game.add.graphics(0, 0);
-        btnRed = this.game.add.button();
+        redKey = game.input.keyboard.addKey(Phaser.Keyboard.R);
+        greenKey = game.input.keyboard.addKey(Phaser.Keyboard.G);
+        blueKey = game.input.keyboard.addKey(Phaser.Keyboard.B);
         this.userCircle = {
             posx : VIEW_WIDTH/2 - VIEW_WIDTH/4,
             posy : VIEW_HEIGHT - 200,
@@ -85,6 +86,12 @@ class Game extends Phaser.State
             }
         };
     }
+    preload()
+    {
+        console.log("game>preload");
+        btnRed = this.game.add.button();
+        
+    }
     create()
     {
         console.log("game>create");
@@ -104,17 +111,36 @@ class Game extends Phaser.State
         
         console.log("game>create>socet id : "+Client.socket.id);
         
+        Client.socket.on('opponentAction', function(data){
+            //convert data to hexadecimal 
+            var col = fullColorHex(data[0], data[1], data[2]);
+            gameReference.opponentCircle.updateColor(col);
+        });
+        Client.socket.on('clientAction', function(data){
+            var col = fullColorHex(data[0], data[1], data[2]);
+            gameReference.userCircle.updateColor(col); 
+        });
+        
     }
     update()
     {
+        if(redKey.isDown){
+            console.log('red key pressed');
+            Client.sendUserInput('input', 'red');
+        }
+        if(greenKey.isDown){
+            console.log('green key pressed');
+            Client.sendUserInput('input','green');
+        }
+        if(blueKey.isDown){
+            console.log('blue key pressed');
+            Client.sendUserInput('input','blue');
+        }
+        
         this.userCircle.render(this.gfx);
         this.opponentCircle.render(this.gfx);
     }
     
-    drawUserBox(posx, posy, graphics)
-    {
-        graphics.beginFill( fullColorHex())
-    }
 }
 
 //the final screen

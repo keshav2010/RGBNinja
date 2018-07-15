@@ -11,7 +11,11 @@ Client.launchGame = function(targetRGB)
     //signals server to begin game
     Client.socket.emit("requestGameStart", targetRGB);
 }
-Client.sendUserInput = function( inputObject )
+Client.sendUserInput = function(userEmitMessage, data)
 {
-    Client.socket.emit('userInput', inputObject);
+    Client.socket.emit(userEmitMessage, data);
+}
+Client.informOpponents= function()
+{
+    Client.socket.emit('dataBroadcastRequest');
 }
