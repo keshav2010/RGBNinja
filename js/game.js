@@ -47,6 +47,7 @@ var game = new Phaser.Game(VIEW_WIDTH, VIEW_HEIGHT, Phaser.CANVAS, '',
 
 //Main Level goes here, where actual gameplay takes place
 var targetRGBDisplay;
+var btnRed,btnGreen, btnBlue;
 class Game extends Phaser.State
 {
     init( targetRGBValue )
@@ -55,31 +56,64 @@ class Game extends Phaser.State
     preload()
     {
         console.log("game>preload");
+        this.gfx = this.game.add.graphics(0, 0);
+        btnRed = this.game.add.button();
+        this.userCircle = {
+            posx : VIEW_WIDTH/2 - VIEW_WIDTH/4,
+            posy : VIEW_HEIGHT - 200,
+            displayColor : 0x000000,
+            updateColor : function(data){
+                this.displayColor = data;
+            },
+            render : function(g){
+                g.beginFill( this.displayColor, 1);
+                g.drawCircle(this.posx, this.posy, 200);
+                g.endFill();
+            }
+        };
+        this.opponentCircle = {
+            posx : VIEW_WIDTH/2 + VIEW_WIDTH/4,
+            posy : VIEW_HEIGHT - 200,
+            displayColor : 0x000000,
+            updateColor : function(data){
+                this.displayColor = data;
+            },
+            render : function(g){
+                g.beginFill( this.displayColor, 1);
+                g.drawCircle(this.posx, this.posy, 200);
+                g.endFill();
+            }
+        };
     }
     create()
     {
         console.log("game>create");
-        this.game.stage.backgroundColor = "rgb(250,250,250)";
-         var graphics = this.game.add.graphics(0, 0);
-
+        this.game.stage.backgroundColor = "rgb(210,210,210)";
+        
         console.log("color : "+ fullColorHex(target.r, target.g, target.b));
         
         //draw a line for seperation
-        graphics.lineStyle(20, 0x33FF00);
-        graphics.moveTo(VIEW_WIDTH/2,0);
-        graphics.lineTo(VIEW_WIDTH/2, VIEW_HEIGHT);
+        this.gfx.lineStyle(20, 0x022551);
+        this.gfx.moveTo(VIEW_WIDTH/2,0);
+        this.gfx.lineTo(VIEW_WIDTH/2, VIEW_HEIGHT);
         
         //draw circle to display the target rgb to acheive 
-        graphics.beginFill(fullColorHex(target.r, target.b, target.g), 1);
-        graphics.drawCircle(VIEW_WIDTH/2,125, 200);
-        graphics.endFill();
+        this.gfx.beginFill(fullColorHex(target.r, target.b, target.g), 1);
+        this.gfx.drawCircle(VIEW_WIDTH/2,125, 200);
+        this.gfx.endFill();
         
         console.log("game>create>socet id : "+Client.socket.id);
         
     }
     update()
     {
-        
+        this.userCircle.render(this.gfx);
+        this.opponentCircle.render(this.gfx);
+    }
+    
+    drawUserBox(posx, posy, graphics)
+    {
+        graphics.beginFill( fullColorHex())
     }
 }
 

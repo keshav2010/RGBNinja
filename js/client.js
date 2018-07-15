@@ -11,3 +11,7 @@ Client.launchGame = function(targetRGB)
     //signals server to begin game
     Client.socket.emit("requestGameStart", targetRGB);
 }
+Client.sendUserInput = function( inputObject )
+{
+    Client.socket.emit('userInput', inputObject);
+}
