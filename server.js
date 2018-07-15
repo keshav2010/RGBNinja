@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const app = express();
-    
+const port=process.env.PORT||3000;
 const gameServer = require('./gameServer.js');
 const httpServer = http.createServer(app);
 
@@ -20,6 +20,6 @@ app.get('/', function(req, res){
 });
 
 
-httpServer.listen(3000, ()=>{
-  console.log("started at port 3000");
+httpServer.listen(port, ()=>{
+  console.log("started at port "+port);
 });
