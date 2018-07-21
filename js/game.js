@@ -96,13 +96,19 @@ class Game extends Phaser.State
             MaxValue : 255, //required by getSliderValue() fxn
             sliderWidth : 200,
             sliderReference : this,
+            
+            setColor : function( _fillCol, _noFillCol){
+                this.fillColor = _fillCol;
+                this.noFillColor = _noFillCol;
+            },
+            
             /*
                 a basic function that returns value between [0, sliderEnd] inclusive
                 and takes variations in sliderWidth into account. The function here only
                 returns whole numbers.
             */
             getSliderValue : function(){
-                return sliderReference.MaxValue * (this.knob.posx - sliderReference.posx) / ( sliderReference.sliderWidth);
+                return this.MaxValue * (this.knob.posx - this.posx) / ( this.sliderWidth);
             },
             setPos : function(_x, _y){
                 this.posx = _x;
@@ -151,14 +157,14 @@ class Game extends Phaser.State
             //render fill rect
             g.beginFill(this.fillColor, 1);
             g.drawRect(gameReference.sliderBar.posx, gameReference.sliderBar.posy, 
-                              gameReference.sliderBar.knob.posx, 50);
+                              gameReference.sliderBar.knob.posx - gameReference.sliderBar.posx, 50);
             g.endFill();
             
 
             
             //render knob
-            g.beginFill(this.fillColor, 0.8);
-            g.drawRoundedRect(gameReference.sliderBar.knob.posx, gameReference.sliderBar.knob.posy, 10, 50, 2);
+            g.beginFill(0xFFFFFF, 1);
+            g.drawRoundedRect(gameReference.sliderBar.knob.posx-5, gameReference.sliderBar.knob.posy, 10, 50, 4);
             g.endFill();
             
             
@@ -196,6 +202,7 @@ class Game extends Phaser.State
         this.userNameFont = this.game.add.bitmapText(this.game.world.centerX - 200, 25, 'userNameFont', 'You', 32);
         this.opponentNameFont = this.game.add.bitmapText(this.game.world.centerX + 200, 25, 'opponentNameFont', 'Opponent', 32);
         
+        
         Client.socket.on('opponentAction', function(data){
             //convert data to hexadecimal 
             var col = fullColorHex(data[0], data[1], data[2]);
@@ -211,8 +218,9 @@ class Game extends Phaser.State
     {
         if(redKey.isDown){
             console.log('red key pressed');
-            Client.sendUserInput('input', 'red');
             this.sliderBar.knob.moveKnob(1);
+            if(this.sliderBar.getSliderValue() < 250)
+            Client.sendUserInput('input', 'red');
         }
         if(greenKey.isDown){
             console.log('green key pressed');
@@ -225,6 +233,8 @@ class Game extends Phaser.State
         this.gfx.clear();
         this.userCircle.render(this.gfx);
         this.opponentCircle.render(this.gfx);
+        
+        //sliders
         this.sliderBar.render(this.gfx);
     }
     
