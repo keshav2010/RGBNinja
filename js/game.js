@@ -55,7 +55,8 @@ class Game extends Phaser.State
     init( targetRGBValue )
     {
         gameReference = this;
-        this.gfx = this.game.add.graphics(0, 0);
+        this.gfx = this.game.add.graphics(0, 0); //responsible for rendering on each frame
+        this.roomGfx = this.game.add.graphics(0,0); //renders only once, not on each frame
         redKey = game.input.keyboard.addKey(Phaser.Keyboard.R);
         greenKey = game.input.keyboard.addKey(Phaser.Keyboard.G);
         blueKey = game.input.keyboard.addKey(Phaser.Keyboard.B);
@@ -85,12 +86,87 @@ class Game extends Phaser.State
                 g.endFill();
             }
         };
+        
+        this.sliderBar = 
+        {
+            posx : VIEW_WIDTH/2 - VIEW_WIDTH/4,
+            posy : VIEW_HEIGHT - 600,
+            fillColor : 0x000000,
+            noFillColor : 0x000000,
+            MaxValue : 255, //required by getSliderValue() fxn
+            sliderWidth : 200,
+            sliderReference : this,
+            /*
+                a basic function that returns value between [0, sliderEnd] inclusive
+                and takes variations in sliderWidth into account. The function here only
+                returns whole numbers.
+            */
+            getSliderValue : function(){
+                return sliderReference.MaxValue * (this.knob.posx - sliderReference.posx) / ( sliderReference.sliderWidth);
+            },
+            setPos : function(_x, _y){
+                this.knob.setPos( _x, _y);
+            },
+            setSize : function( _size){
+                this.sliderWidth = _size;
+            }
+        };
+        this.sliderBar.knob = {
+            /*
+                Constraints on knob.posx : 
+                slider.posx <= knob.posx <= slider.posx + sliderWidth
+
+                these constraints are important for getSliderValue() method to work correctly
+            */
+            posx: gameReference.sliderBar.posx,
+            posy: gameReference.sliderBar.posy,
+            moveKnob : function( _delta)
+            {
+                //if change is negative, ignore
+                if( _delta < 0)
+                    return;
+                //if change exceeds out of the limit, set knob.posX to max value
+                if( _delta + this.posx > gameReference.sliderBar.posx + gameReference.sliderBar.sliderWidth){
+                    this.posx = gameReference.sliderBar.posx + gameReference.sliderBar.sliderWidth;
+                    return;
+                }
+                //else add change into knob.posX if within constraints limit
+                this.posx += _delta;
+            },
+            setPos : function( _x, _y){
+                this.posx = _x;
+                this.posy = _y;
+            }
+        };
+        this.sliderBar.render = function(g){
+            
+            //render fill rect
+            g.beginFill(this.fillColor, 1);
+            g.drawRoundedRect(gameReference.sliderBar.posx - gameReference.sliderBar.sliderWidth, gameReference.sliderBar.posy, 
+                              gameReference.sliderBar.getSliderValue + gameReference.sliderBar.posx, 50, 1);
+            g.endFill();
+            
+            //render base rect
+            g.beginFill(this.noFillColor, 1);
+            g.drawRoundedRect(gameReference.sliderBar.posx - gameReference.sliderBar.sliderWidth, gameReference.sliderBar.posy, 
+                                gameReference.sliderBar.sliderWidth, 50, 1);
+            g.endFill();
+            
+            //render knob
+            g.beginFill(this.fillColor, 1);
+            g.drawRoundedRect(gameReference.sliderBar.knob.posx, gameReference.sliderBar.knob.posy, 10, 50, 1);
+            g.endFill();
+            
+            
+        };
+        //end of sliderbar
     }
     preload()
     {
         console.log("game>preload");
         btnRed = this.game.add.button();
-        
+        this.game.load.bitmapFont('userNameFont', '/assets/fonts/pixograd.png', '/assets/fonts/pixograd.fnt');
+        this.game.load.bitmapFont('opponentNameFont', '/assets/fonts/pixograd.png', '/assets/fonts/pixograd.fnt');
     }
     create()
     {
@@ -100,16 +176,21 @@ class Game extends Phaser.State
         console.log("color : "+ fullColorHex(target.r, target.g, target.b));
         
         //draw a line for seperation
-        this.gfx.lineStyle(20, 0x022551);
-        this.gfx.moveTo(VIEW_WIDTH/2,0);
-        this.gfx.lineTo(VIEW_WIDTH/2, VIEW_HEIGHT);
+        this.roomGfx.lineStyle(20, 0x022551);
+        this.roomGfx.moveTo(VIEW_WIDTH/2,0);
+        this.roomGfx.lineTo(VIEW_WIDTH/2, VIEW_HEIGHT);
         
         //draw circle to display the target rgb to acheive 
-        this.gfx.beginFill(fullColorHex(target.r, target.b, target.g), 1);
-        this.gfx.drawCircle(VIEW_WIDTH/2,125, 200);
-        this.gfx.endFill();
+        this.roomGfx.beginFill(fullColorHex(target.r, target.b, target.g), 1);
+        this.roomGfx.drawCircle(VIEW_WIDTH/2,125, 200);
+        this.roomGfx.endFill();
         
         console.log("game>create>socet id : "+Client.socket.id);
+        this.sliderBar.setPos(50, 200);
+        this.sliderBar.setSize(250);
+        
+        this.userNameFont = this.game.add.bitmapText(this.game.world.centerX - 200, 25, 'userNameFont', 'You', 32);
+        this.opponentNameFont = this.game.add.bitmapText(this.game.world.centerX + 200, 25, 'opponentNameFont', 'Opponent', 32);
         
         Client.socket.on('opponentAction', function(data){
             //convert data to hexadecimal 
@@ -127,6 +208,7 @@ class Game extends Phaser.State
         if(redKey.isDown){
             console.log('red key pressed');
             Client.sendUserInput('input', 'red');
+            this.sliderBar.knob.moveKnob(1);
         }
         if(greenKey.isDown){
             console.log('green key pressed');
@@ -136,9 +218,10 @@ class Game extends Phaser.State
             console.log('blue key pressed');
             Client.sendUserInput('input','blue');
         }
-        
+        this.gfx.clear();
         this.userCircle.render(this.gfx);
         this.opponentCircle.render(this.gfx);
+        this.sliderBar.render(this.gfx);
     }
     
 }
