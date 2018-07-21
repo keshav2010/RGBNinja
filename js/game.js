@@ -91,7 +91,7 @@ class Game extends Phaser.State
         {
             posx : VIEW_WIDTH/2 - VIEW_WIDTH/4,
             posy : VIEW_HEIGHT - 600,
-            fillColor : 0x000000,
+            fillColor : 0xFF0000,
             noFillColor : 0x000000,
             MaxValue : 255, //required by getSliderValue() fxn
             sliderWidth : 200,
@@ -105,6 +105,8 @@ class Game extends Phaser.State
                 return sliderReference.MaxValue * (this.knob.posx - sliderReference.posx) / ( sliderReference.sliderWidth);
             },
             setPos : function(_x, _y){
+                this.posx = _x;
+                this.posy = _y;
                 this.knob.setPos( _x, _y);
             },
             setSize : function( _size){
@@ -140,21 +142,23 @@ class Game extends Phaser.State
         };
         this.sliderBar.render = function(g){
             
-            //render fill rect
-            g.beginFill(this.fillColor, 1);
-            g.drawRoundedRect(gameReference.sliderBar.posx - gameReference.sliderBar.sliderWidth, gameReference.sliderBar.posy, 
-                              gameReference.sliderBar.getSliderValue + gameReference.sliderBar.posx, 50, 1);
-            g.endFill();
-            
             //render base rect
             g.beginFill(this.noFillColor, 1);
-            g.drawRoundedRect(gameReference.sliderBar.posx - gameReference.sliderBar.sliderWidth, gameReference.sliderBar.posy, 
-                                gameReference.sliderBar.sliderWidth, 50, 1);
+            g.drawRect(gameReference.sliderBar.posx, gameReference.sliderBar.posy, 
+                                gameReference.sliderBar.sliderWidth, 50);
             g.endFill();
             
-            //render knob
+            //render fill rect
             g.beginFill(this.fillColor, 1);
-            g.drawRoundedRect(gameReference.sliderBar.knob.posx, gameReference.sliderBar.knob.posy, 10, 50, 1);
+            g.drawRect(gameReference.sliderBar.posx, gameReference.sliderBar.posy, 
+                              gameReference.sliderBar.knob.posx, 50);
+            g.endFill();
+            
+
+            
+            //render knob
+            g.beginFill(this.fillColor, 0.8);
+            g.drawRoundedRect(gameReference.sliderBar.knob.posx, gameReference.sliderBar.knob.posy, 10, 50, 2);
             g.endFill();
             
             
