@@ -44,12 +44,18 @@ var game = new Phaser.Game(VIEW_WIDTH, VIEW_HEIGHT, Phaser.CANVAS, '', {
 
 //Main Level goes here, where actual gameplay takes place
 var targetRGBDisplay;
-var btnRed, btnGreen, btnBlue;
+
 var redKey, blueKey, greenKey;
+var fingerTouch;
+
 var gameReference;
 class Game extends Phaser.State {
     init(targetRGBValue) {
         gameReference = this;
+        
+        fingerTouch = this.game.input.addPointer();//add support for 1 finger touch
+        
+        console.log(fingerTouch);
         this.gfx = this.game.add.graphics(0, 0); //responsible for rendering on each frame
         this.roomGfx = this.game.add.graphics(0, 0); //renders only once, not on each frame
         redKey = game.input.keyboard.addKey(Phaser.Keyboard.R);
@@ -154,7 +160,6 @@ class Game extends Phaser.State {
     } //END OF INIT()
     preload() {
         console.log("game>preload");
-        btnRed = this.game.add.button();
         this.game.load.bitmapFont('userNameFont', '/assets/fonts/pixograd.png', '/assets/fonts/pixograd.fnt');
         this.game.load.bitmapFont('opponentNameFont', '/assets/fonts/pixograd.png', '/assets/fonts/pixograd.fnt');
         
@@ -221,6 +226,20 @@ class Game extends Phaser.State {
             if (this.blueSlider.getSliderValue() < 250)
                 Client.sendUserInput('input', 'blue');
         }
+        
+        if(fingerTouch.isDown){
+            
+            //
+            if(fingerTouch.clientX >= this.redSlider.posx && fingerTouch.clientX <= this.redSlider.posx + this.redSlider.sliderWidth
+              && fingerTouch.clientY <= this.redSlider.posy && fingerTouch.clientY >= this.redSlider.posy - 50)
+            {
+                alert('touching red');
+            }
+            
+        }
+    }
+    
+    render(){
         this.gfx.clear();
         this.userCircle.render(this.gfx);
         this.opponentCircle.render(this.gfx);
@@ -229,8 +248,10 @@ class Game extends Phaser.State {
         this.redSlider.render(this.gfx);
         this.greenSlider.render(this.gfx);
         this.blueSlider.render(this.gfx);
+        
+        this.game.debug.pointer(this.game.input.mousePointer);
+        this.game.debug.pointer(this.game.input.pointer1);
     }
-
 }
 
 //the final screen
