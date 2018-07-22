@@ -46,16 +46,14 @@ var game = new Phaser.Game(VIEW_WIDTH, VIEW_HEIGHT, Phaser.CANVAS, '', {
 var targetRGBDisplay;
 
 var redKey, blueKey, greenKey;
-var fingerTouch;
 
 var gameReference;
 class Game extends Phaser.State {
     init(targetRGBValue) {
         gameReference = this;
         
-        fingerTouch = this.game.input.mousePointer//this.game.input.addPointer();//add support for 1 finger touch
+        this.game.input.onDown.add(this.checkTap, this);
         
-        console.log(fingerTouch);
         this.gfx = this.game.add.graphics(0, 0); //responsible for rendering on each frame
         this.roomGfx = this.game.add.graphics(0, 0); //renders only once, not on each frame
         redKey = game.input.keyboard.addKey(Phaser.Keyboard.R);
@@ -206,6 +204,16 @@ class Game extends Phaser.State {
         });
 
     }
+    checkTap(pointer){
+        console.log(pointer.isDown);
+        console.log(pointer);
+            if(pointer.clientX >= this.redSlider.posx && pointer.clientX <= this.redSlider.posx + this.redSlider.sliderWidth
+              && pointer.clientY >= this.redSlider.posy && pointer.clientY <= this.redSlider.posy + 50)
+        {
+                alert('touching red');
+        }
+            
+    }
     update() {
         if (redKey.isDown) {
             console.log('red key pressed');
@@ -225,17 +233,6 @@ class Game extends Phaser.State {
             this.blueSlider.knob.moveKnob(1, this.blueSlider);
             if (this.blueSlider.getSliderValue() < 250)
                 Client.sendUserInput('input', 'blue');
-        }
-        
-        if(fingerTouch.isDown){
-                
-            console.log(fingerTouch);
-            if(fingerTouch.clientX >= this.redSlider.posx && fingerTouch.clientX <= this.redSlider.posx + this.redSlider.sliderWidth
-              && fingerTouch.clientY >= this.redSlider.posy && fingerTouch.clientY <= this.redSlider.posy + 50)
-            {
-                alert('touching red');
-            }
-            
         }
     }
     
