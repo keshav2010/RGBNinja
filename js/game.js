@@ -53,7 +53,7 @@ class Game extends Phaser.State {
     init(targetRGBValue) {
         gameReference = this;
         
-        fingerTouch = this.game.input.addPointer();//add support for 1 finger touch
+        fingerTouch = this.game.input.mousePointer//this.game.input.addPointer();//add support for 1 finger touch
         
         console.log(fingerTouch);
         this.gfx = this.game.add.graphics(0, 0); //responsible for rendering on each frame
@@ -228,10 +228,10 @@ class Game extends Phaser.State {
         }
         
         if(fingerTouch.isDown){
-            
-            //
+                
+            console.log(fingerTouch);
             if(fingerTouch.clientX >= this.redSlider.posx && fingerTouch.clientX <= this.redSlider.posx + this.redSlider.sliderWidth
-              && fingerTouch.clientY <= this.redSlider.posy && fingerTouch.clientY >= this.redSlider.posy - 50)
+              && fingerTouch.clientY >= this.redSlider.posy && fingerTouch.clientY <= this.redSlider.posy + 50)
             {
                 alert('touching red');
             }
