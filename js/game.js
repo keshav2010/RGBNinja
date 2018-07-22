@@ -210,7 +210,7 @@ class Game extends Phaser.State {
             if(pointer.clientX >= this.redSlider.posx && pointer.clientX <= this.redSlider.posx + this.redSlider.sliderWidth
               && pointer.clientY >= this.redSlider.posy && pointer.clientY <= this.redSlider.posy + 50)
         {
-                alert('touching red');
+                this.redSlider.knob.moveKnob(1, this.redSlider);
         }
             
     }
