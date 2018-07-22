@@ -87,96 +87,97 @@ class Game extends Phaser.State
             }
         };
         
-        this.sliderBar = 
+        this.SliderBar = function(x, y, fc, nfc, w)
         {
-            posx : VIEW_WIDTH/2 - VIEW_WIDTH/4,
-            posy : VIEW_HEIGHT - 600,
-            fillColor : 0xFF0000,
-            noFillColor : 0x000000,
-            MaxValue : 255, //required by getSliderValue() fxn
-            sliderWidth : 200,
-            sliderReference : this,
-            
-            setColor : function( _fillCol, _noFillCol){
+            this.posx = x;
+            this.posy = y;
+            this.fillColor = fc;
+            this.noFillColor = nfc;
+            this.MaxValue = 255; //required by getSliderValue() fxn
+            this.sliderWidth = w;
+            this.sliderReference = this;
+            this.knob={};
+        };
+        this.SliderBar.knob = function(x, y){
+            this.posx = x;
+            this.posy = y;
+        }
+        this.SliderBar.prototype.setColor = function( _fillCol, _noFillCol){
                 this.fillColor = _fillCol;
                 this.noFillColor = _noFillCol;
-            },
-            
-            /*
-                a basic function that returns value between [0, sliderEnd] inclusive
-                and takes variations in sliderWidth into account. The function here only
-                returns whole numbers.
-            */
-            getSliderValue : function(){
-                return this.MaxValue * (this.knob.posx - this.posx) / ( this.sliderWidth);
-            },
-            setPos : function(_x, _y){
+        };
+        this.SliderBar.prototype.getSliderValue = function(){
+                return this.MaxValue *(this.knob.posx-this.posx)/(this.sliderWidth);
+        };
+        this.SliderBar.prototype.setPos = function(_x, _y){
                 this.posx = _x;
                 this.posy = _y;
                 this.knob.setPos( _x, _y);
-            },
-            setSize : function( _size){
-                this.sliderWidth = _size;
-            }
         };
-        this.sliderBar.knob = {
-            /*
-                Constraints on knob.posx : 
-                slider.posx <= knob.posx <= slider.posx + sliderWidth
-
-                these constraints are important for getSliderValue() method to work correctly
-            */
-            posx: gameReference.sliderBar.posx,
-            posy: gameReference.sliderBar.posy,
-            moveKnob : function( _delta)
-            {
-                //if change is negative, ignore
-                if( _delta < 0)
-                    return;
-                //if change exceeds out of the limit, set knob.posX to max value
-                if( _delta + this.posx > gameReference.sliderBar.posx + gameReference.sliderBar.sliderWidth){
-                    this.posx = gameReference.sliderBar.posx + gameReference.sliderBar.sliderWidth;
-                    return;
-                }
-                //else add change into knob.posX if within constraints limit
-                this.posx += _delta;
-            },
-            setPos : function( _x, _y){
+        this.SliderBar.prototype.setSize = function( _size){
+                this.sliderWidth = _size;
+        };
+        
+        this.SliderBar.knob.prototype.moveKnob = function( _delta, slider)
+        {
+            //if change is negative, ignore
+            if( _delta < 0)
+                return;
+            //if change exceeds out of the limit, set knob.posX to max value
+            
+            if( _delta + this.posx > slider.posx + slider.sliderWidth){
+                this.posx = slider.posx + slider.sliderWidth;
+                return;
+            }
+            //else add change into knob.posX if within constraints limit
+            this.posx += _delta;
+        };
+        
+        this.SliderBar.knob.prototype.setPos = function( _x, _y){
                 this.posx = _x;
                 this.posy = _y;
-            }
         };
-        this.sliderBar.render = function(g){
+        
+        this.SliderBar.prototype.render = function(g){
             
             //render base rect
             g.beginFill(this.noFillColor, 1);
-            g.drawRect(gameReference.sliderBar.posx, gameReference.sliderBar.posy, 
-                                gameReference.sliderBar.sliderWidth, 50);
+            g.drawRect(this.posx, this.posy, 
+                                this.sliderWidth, 50);
             g.endFill();
             
             //render fill rect
             g.beginFill(this.fillColor, 1);
-            g.drawRect(gameReference.sliderBar.posx, gameReference.sliderBar.posy, 
-                              gameReference.sliderBar.knob.posx - gameReference.sliderBar.posx, 50);
+            g.drawRect(this.posx, this.posy, 
+                              this.knob.posx - this.posx, 50);
             g.endFill();
             
 
             
             //render knob
             g.beginFill(0xFFFFFF, 1);
-            g.drawRoundedRect(gameReference.sliderBar.knob.posx-5, gameReference.sliderBar.knob.posy, 10, 50, 4);
+            g.drawRoundedRect(this.knob.posx-5, this.knob.posy, 10, 50, 4);
             g.endFill();
             
             
         };
         //end of sliderbar
-    }
+    }//END OF INIT()
     preload()
     {
         console.log("game>preload");
         btnRed = this.game.add.button();
         this.game.load.bitmapFont('userNameFont', '/assets/fonts/pixograd.png', '/assets/fonts/pixograd.fnt');
         this.game.load.bitmapFont('opponentNameFont', '/assets/fonts/pixograd.png', '/assets/fonts/pixograd.fnt');
+        
+        this.redSlider = new this.SliderBar(VIEW_WIDTH/2 - VIEW_WIDTH/4, VIEW_HEIGHT - 600, 0x2FF2FF, 0x000000, 200);
+        this.redSlider.knob = new this.SliderBar.knob( this.redSlider.posx, this.redSlider.posy);
+    
+        this.greenSlider = new this.SliderBar(VIEW_WIDTH/2 - VIEW_WIDTH/4, VIEW_HEIGHT - 400, 0x2FFFFF, 0x000000, 200);
+        this.greenSlider.knob = new this.SliderBar.knob( this.greenSlider.posx, this.greenSlider.posy);
+        
+        this.blueSlider = new this.SliderBar(VIEW_WIDTH/2 - VIEW_WIDTH/4, VIEW_HEIGHT - 200, 0x5FFFFF, 0x000000, 200);
+        this.blueSlider.knob = new this.SliderBar.knob( this.blueSlider.posx, this.blueSlider.posy);
     }
     create()
     {
@@ -196,8 +197,6 @@ class Game extends Phaser.State
         this.roomGfx.endFill();
         
         console.log("game>create>socet id : "+Client.socket.id);
-        this.sliderBar.setPos(50, 200);
-        this.sliderBar.setSize(250);
         
         this.userNameFont = this.game.add.bitmapText(this.game.world.centerX - 200, 25, 'userNameFont', 'You', 32);
         this.opponentNameFont = this.game.add.bitmapText(this.game.world.centerX + 200, 25, 'opponentNameFont', 'Opponent', 32);
@@ -218,24 +217,31 @@ class Game extends Phaser.State
     {
         if(redKey.isDown){
             console.log('red key pressed');
-            this.sliderBar.knob.moveKnob(1);
-            if(this.sliderBar.getSliderValue() < 250)
-            Client.sendUserInput('input', 'red');
+            this.redSlider.knob.moveKnob(1, this.redSlider);
+            if(this.redSlider.getSliderValue() < 250)
+                Client.sendUserInput('input', 'red');
         }
         if(greenKey.isDown){
             console.log('green key pressed');
-            Client.sendUserInput('input','green');
+            this.greenSlider.knob.moveKnob(1, this.greenSlider);
+            if(this.greenSlider.getSliderValue() < 250)
+                Client.sendUserInput('input','green');
         }
         if(blueKey.isDown){
             console.log('blue key pressed');
-            Client.sendUserInput('input','blue');
+            
+            this.blueSlider.knob.moveKnob(1, this.blueSlider);
+            if(this.blueSlider.getSliderValue() < 250)
+                Client.sendUserInput('input','blue');
         }
         this.gfx.clear();
         this.userCircle.render(this.gfx);
         this.opponentCircle.render(this.gfx);
         
         //sliders
-        this.sliderBar.render(this.gfx);
+        this.redSlider.render(this.gfx);
+        this.greenSlider.render(this.gfx);
+        this.blueSlider.render(this.gfx);
     }
     
 }
