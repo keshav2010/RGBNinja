@@ -206,38 +206,52 @@ class Game extends Phaser.State {
 
     }
     update() {
-        //move this line out
+        //move t
         var pointer = this.game.input.activePointer;
         
-        if (redKey.isDown || this.game.input.activePointer.isDown) {
-            
-            if(redKey.isDown || (pointer.x >= this.redSlider.posx && pointer.x <= this.redSlider.posx + this.redSlider.sliderWidth
-                  && pointer.y >= this.redSlider.posy && pointer.y <= this.redSlider.posy + this.redSlider.barHeight))
-            {
-                this.redSlider.knob.moveKnob(1, this.redSlider);
-            }
+        if (redKey.isDown) {
+            this.redSlider.knob.moveKnob(1, this.redSlider);
             if (this.redSlider.getSliderValue() < 250)
                 Client.sendUserInput('input', 'red');
         }
-        if (greenKey.isDown || this.game.input.activePointer.isDown) {
+        if (greenKey.isDown) {
             
-            if(greenKey.isDown || (pointer.x >= this.greenSlider.posx && pointer.x <= this.greenSlider.posx + this.greenSlider.sliderWidth
-                  && pointer.y >= this.greenSlider.posy && pointer.y <= this.greenSlider.posy + this.greenSlider.barHeight))
-            {
-                this.greenSlider.knob.moveKnob(1, this.greenSlider);
-            }
+            this.greenSlider.knob.moveKnob(1, this.greenSlider);
             if (this.greenSlider.getSliderValue() < 250)
                 Client.sendUserInput('input', 'green');
         }
-        if (blueKey.isDown || this.game.input.activePointer.isDown) {
+        if (blueKey.isDown) {
             
-            if(blueKey.isDown || (pointer.x >= this.blueSlider.posx && pointer.x <= this.blueSlider.posx + this.blueSlider.sliderWidth
-                  && pointer.y >= this.blueSlider.posy && pointer.y <= this.blueSlider.posy + this.blueSlider.barHeight))
-            {
-                this.blueSlider.knob.moveKnob(1, this.blueSlider);
-            }
+            this.blueSlider.knob.moveKnob(1, this.blueSlider);
             if (this.blueSlider.getSliderValue() < 250)
                 Client.sendUserInput('input', 'blue');
+        }
+        
+        if(this.game.input.activePointer.isDown)
+        {
+            var pointer = this.game.input.activePointer;
+            
+            if(pointer.x >= this.redSlider.posx && pointer.x <= this.redSlider.posx + this.redSlider.sliderWidth
+                  && pointer.y >= this.redSlider.posy && pointer.y <= this.redSlider.posy + this.redSlider.barHeight)
+            {
+                this.redSlider.knob.moveKnob(1, this.redSlider);
+                if (this.redSlider.getSliderValue() < 250)
+                    Client.sendUserInput('input', 'red');
+            }
+            else if(pointer.x >= this.greenSlider.posx && pointer.x <= this.greenSlider.posx + this.greenSlider.sliderWidth
+                  && pointer.y >= this.greenSlider.posy && pointer.y <= this.greenSlider.posy + this.greenSlider.barHeight)
+            {
+                this.greenSlider.knob.moveKnob(1, this.greenSlider);
+                if (this.greenSlider.getSliderValue() < 250)
+                    Client.sendUserInput('input', 'green');
+            }
+            else if(pointer.x >= this.blueSlider.posx && pointer.x <= this.blueSlider.posx + this.blueSlider.sliderWidth
+                  && pointer.y >= this.blueSlider.posy && pointer.y <= this.blueSlider.posy + this.blueSlider.barHeight)
+            {
+                this.blueSlider.knob.moveKnob(1, this.blueSlider);
+                if (this.blueSlider.getSliderValue() < 250)
+                    Client.sendUserInput('input', 'blue');
+            }
         }
         
     }
