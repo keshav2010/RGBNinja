@@ -206,7 +206,7 @@ class Game extends Phaser.State {
     }
     checkHold(pointer){
         
-        this.redSlider.knob.moveKnob(1, this.redSlider);
+        this.redSlider.knob.moveKnob(5, this.redSlider);
         
         if(pointer.clientX >= this.redSlider.posx && pointer.clientX <= this.redSlider.posx + this.redSlider.sliderWidth
               && pointer.clientY >= this.redSlider.posy && pointer.clientY <= this.redSlider.posy + 50)
