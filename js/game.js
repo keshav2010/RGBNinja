@@ -91,6 +91,7 @@ class Game extends Phaser.State {
             this.posy = y;
             this.fillColor = fc;
             this.noFillColor = nfc;
+            this.barHeight = 50;
             this.MaxValue = 255; //required by getSliderValue() fxn
             this.sliderWidth = w;
             this.sliderReference = this;
@@ -140,18 +141,18 @@ class Game extends Phaser.State {
             //render base rect
             g.beginFill(this.noFillColor, 1);
             g.drawRect(this.posx, this.posy,
-                this.sliderWidth, 50);
+                this.sliderWidth, this.barHeight);
             g.endFill();
 
             //render fill rect
             g.beginFill(this.fillColor, 1);
             g.drawRect(this.posx, this.posy,
-                this.knob.posx - this.posx, 50);
+                this.knob.posx - this.posx, this.barHeight);
             g.endFill();
 
             //render knob
             g.beginFill(0xFFFFFF, 1);
-            g.drawRoundedRect(this.knob.posx - 5, this.knob.posy, 10, 50, 4);
+            g.drawRoundedRect(this.knob.posx - 5, this.knob.posy, 10, this.barHeight, 4);
             g.endFill();
         };
         //end of sliderbar
@@ -205,35 +206,40 @@ class Game extends Phaser.State {
 
     }
     update() {
-        if (redKey.isDown) {
-            console.log('red key pressed');
-            this.redSlider.knob.moveKnob(1, this.redSlider);
+        //move this line out
+        var pointer = this.game.input.activePointer;
+        
+        if (redKey.isDown || this.game.input.activePointer.isDown) {
+            
+            if(redKey.isDown || (pointer.x >= this.redSlider.posx && pointer.x <= this.redSlider.posx + this.redSlider.sliderWidth
+                  && pointer.y >= this.redSlider.posy && pointer.y <= this.redSlider.posy + this.redSlider.barHeight))
+            {
+                this.redSlider.knob.moveKnob(1, this.redSlider);
+            }
             if (this.redSlider.getSliderValue() < 250)
                 Client.sendUserInput('input', 'red');
         }
-        if (greenKey.isDown) {
-            console.log('green key pressed');
-            this.greenSlider.knob.moveKnob(1, this.greenSlider);
+        if (greenKey.isDown || this.game.input.activePointer.isDown) {
+            
+            if(greenKey.isDown || (pointer.x >= this.greenSlider.posx && pointer.x <= this.greenSlider.posx + this.greenSlider.sliderWidth
+                  && pointer.y >= this.greenSlider.posy && pointer.y <= this.greenSlider.posy + this.greenSlider.barHeight))
+            {
+                this.greenSlider.knob.moveKnob(1, this.greenSlider);
+            }
             if (this.greenSlider.getSliderValue() < 250)
                 Client.sendUserInput('input', 'green');
         }
-        if (blueKey.isDown) {
-            console.log('blue key pressed');
-
-            this.blueSlider.knob.moveKnob(1, this.blueSlider);
+        if (blueKey.isDown || this.game.input.activePointer.isDown) {
+            
+            if(blueKey.isDown || (pointer.x >= this.blueSlider.posx && pointer.x <= this.blueSlider.posx + this.blueSlider.sliderWidth
+                  && pointer.y >= this.blueSlider.posy && pointer.y <= this.blueSlider.posy + this.blueSlider.barHeight))
+            {
+                this.blueSlider.knob.moveKnob(1, this.blueSlider);
+            }
             if (this.blueSlider.getSliderValue() < 250)
                 Client.sendUserInput('input', 'blue');
         }
-        if(this.game.input.activePointer.isDown)
-        {
-            var pointer = this.game.input.activePointer;
-            
-            if(pointer.x >= this.redSlider.posx && pointer.x <= this.redSlider.posx + this.redSlider.sliderWidth
-                  && pointer.y >= this.redSlider.posy && pointer.y <= this.redSlider.posy + 50)
-            {
-                    this.redSlider.knob.moveKnob(1, this.redSlider);
-            }
-        }
+        
     }
     
     render(){
