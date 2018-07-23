@@ -51,7 +51,8 @@ var gameReference;
 class Game extends Phaser.State {
     init(targetRGBValue) {
         gameReference = this;
-        this.game.input.onDown.add(this.checkTap, this);
+        
+        this.game.input.onHold.add(this.checkHold, this);
         
         this.gfx = this.game.add.graphics(0, 0); //responsible for rendering on each frame
         this.roomGfx = this.game.add.graphics(0, 0); //renders only once, not on each frame
@@ -203,7 +204,7 @@ class Game extends Phaser.State {
         });
 
     }
-    checkTap(pointer){
+    checkHold(pointer){
         
         this.redSlider.knob.moveKnob(1, this.redSlider);
         
