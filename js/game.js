@@ -52,7 +52,7 @@ class Game extends Phaser.State {
     init(targetRGBValue) {
         gameReference = this;
         
-        this.game.input.onHold.add(this.checkHold, this);
+        this.game.input.addPointer();
         
         this.gfx = this.game.add.graphics(0, 0); //responsible for rendering on each frame
         this.roomGfx = this.game.add.graphics(0, 0); //renders only once, not on each frame
@@ -204,17 +204,6 @@ class Game extends Phaser.State {
         });
 
     }
-    checkHold(pointer){
-        
-        this.redSlider.knob.moveKnob(5, this.redSlider);
-        
-        if(pointer.clientX >= this.redSlider.posx && pointer.clientX <= this.redSlider.posx + this.redSlider.sliderWidth
-              && pointer.clientY >= this.redSlider.posy && pointer.clientY <= this.redSlider.posy + 50)
-        {
-                this.redSlider.knob.moveKnob(1, this.redSlider);
-        }
-            
-    }
     update() {
         if (redKey.isDown) {
             console.log('red key pressed');
@@ -235,6 +224,16 @@ class Game extends Phaser.State {
             if (this.blueSlider.getSliderValue() < 250)
                 Client.sendUserInput('input', 'blue');
         }
+        if(this.game.input.activePointer.isDown)
+        {
+            var pointer = this.game.input.activePointer;
+            
+            if(pointer.clientX >= this.redSlider.posx && pointer.clientX <= this.redSlider.posx + this.redSlider.sliderWidth
+                  && pointer.clientY >= this.redSlider.posy && pointer.clientY <= this.redSlider.posy + 50)
+            {
+                    this.redSlider.knob.moveKnob(1, this.redSlider);
+            }
+        }
     }
     
     render(){
@@ -247,8 +246,7 @@ class Game extends Phaser.State {
         this.greenSlider.render(this.gfx);
         this.blueSlider.render(this.gfx);
         
-        this.game.debug.pointer(this.game.input.mousePointer);
-        this.game.debug.pointer(this.game.input.pointer1);
+        this.game.debug.pointer(this.game.input.activePointer);
     }
 }
 
