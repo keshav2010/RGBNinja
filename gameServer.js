@@ -88,8 +88,10 @@ function User(_userName, _socket)
         if(this.currentRoom == undefined)
             return;
         
-        this.currentRoom.removeUser( this.userName);
+        //inform other users in room about user who left the room
+        this.serverSideSocket.broadcast.to(this.currentRoom.roomName).emit('userLeft', this.userName);
         
+        this.currentRoom.removeUser( this.userName);
         this.serverSideSocket.leave( this.currentRoom.roomName);
         
         //clear room if no user in it
@@ -97,6 +99,7 @@ function User(_userName, _socket)
             console.log("clearing currentRoom , 0 players");
             activeRooms.delete(this.currentRoom.roomName);
         }
+        
         this.currentRoom = undefined;
     };
 }
@@ -257,7 +260,9 @@ function leaveRoom(_socket) {
             console.log("leaveRoom > no such client, ERROR, This should never be printed");
             return;
         }
+    //leave current room
     activeClients.get(_socket.clientName).leaveCurrentRoom();
+    
 }
 const getRand = function(low, high){
   return Math.floor((Math.random() * high) + low);

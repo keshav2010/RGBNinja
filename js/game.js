@@ -4,7 +4,7 @@ in order to use it for browser side, we need to use browserify or other third pa
 for avoiding learning so many libraries
 Use : http://kvazars.com/littera/ to generate bitmap font's xml file (.fnt / xml)
 */
-
+var form = $("#form3");
 const VIEW_WIDTH = 1024;
 const VIEW_HEIGHT = 768;
 var target;
@@ -33,10 +33,10 @@ var game = new Phaser.Game(VIEW_WIDTH, VIEW_HEIGHT, Phaser.CANVAS, '', {
         this.loginText = game.add.bitmapText(this.game.world.centerX - 200, 25, 'loginTitle', 'RGB\nNinja', 72);
         this.loginText.text = 'rgb ninja';
         console.log("gamejs > game > create > socket is : " + Client.socket.id);
-        //error ; this is never triggered, socket.on() doesn't work
+
         Client.socket.on("startGame", function (targetRGBValue) {
             target = targetRGBValue;
-            game.state.start('Game');
+            game.state.start('Game');   
         });
     }
 });
@@ -203,6 +203,11 @@ class Game extends Phaser.State {
             var col = fullColorHex(data[0], data[1], data[2]);
             gameReference.userCircle.updateColor(col);
         });
+        Client.socket.on('userLeft', function(userName){
+            //no player left to play, Leave the room
+            //i might change this to keeping room alive, however as of now don't change this
+            game.state.start('GameOver');
+        });
 
     }
     update() {
@@ -271,15 +276,13 @@ class Game extends Phaser.State {
 }
 
 //the final screen
-class GameOver extends Phaser.State {
-    preload() {
-
-    }
-    create() {
-
-    }
-    update() {
-
+class GameOver extends Phaser.State 
+{
+    create()
+    {
+        this.game.stage.backgroundColor = "rgb(" + getRand(50, 150) + "," + getRand(0, 60) + "," + getRand(100, 200) + ")";
+        this.loginText = game.add.bitmapText(this.game.world.centerX - 200, 25, 'loginTitle', 'User Left', 72);
+        form.removeClass("hide");
     }
 }
 
