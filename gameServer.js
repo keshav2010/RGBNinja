@@ -46,12 +46,16 @@ function GameRoom(_roomName)
     }
     //this method should never be called directly
     this.removeUser = function( _userName){
-        if(this.connectedUsers.get(_userName) == undefined || this.playerCount == 0)
+        console.log("Room removeUser > attempting to remove user : "+ _userName+ " from room : "+this.roomName);
+        if(this.connectedUsers.get(_userName) == undefined || this.playerCount == 0){
+            console.log(" user not registered as connected for this room, current there are :" + this.playerCount + " players");
             return false;
-        this.connectedUsers.delete(_userName); //removes only the property, doesn't free up memory
+        }
+        this.connectedUsers.delete(_userName);
         this.playerCount = this.connectedUsers.size;
         if(this.playerCount == undefined)
             this.playerCount=0;
+        console.log(" removed user , player left in room : " + this.playerCount);
         return true;
     }
     
@@ -83,10 +87,14 @@ function User(_userName, _socket)
         }
     };
     
+    //leave current room if it exist, as well inform other users in room about room status,
+    //if no player in room then clear the room.
     this.leaveCurrentRoom = function(){
-        
-        if(this.currentRoom == undefined)
+        console.log("User Attempting to leave its current Room");
+        if(this.currentRoom == undefined){
+            console.log("current room undefined");
             return;
+        }
         
         //inform other users in room about user who left the room
         this.serverSideSocket.broadcast.to(this.currentRoom.roomName).emit('userLeft', this.userName);
@@ -94,9 +102,8 @@ function User(_userName, _socket)
         this.currentRoom.removeUser( this.userName);
         this.serverSideSocket.leave( this.currentRoom.roomName);
         
-        //clear room if no user in it
+        //clear the room if no user in it
         if( activeRooms.get(this.currentRoom.roomName).playerCount == 0){
-            console.log("clearing currentRoom , 0 players");
             activeRooms.delete(this.currentRoom.roomName);
         }
         
@@ -190,6 +197,19 @@ exports.listen = function (server) {
         socket.on("requestGameStart", function(targetRGBValue){
            socket.emit('startGame', targetRGBValue); 
         });
+        
+        //server recieved user request to terminate the game room and clear it completely
+        socket.on("requestRoomEnd", function(roomname){
+            var roomname = activeClients.get(socket.clientName).currentRoom.roomName;
+            if(leaveRoom(socket)){
+                //delete the room
+                activeRooms.delete(roomname);
+                socket.emit('roomEndAccepted');
+            }
+            else{ 
+                socket.emit('roomEndRejected');
+            }
+        });
         socket.on('disconnect', function () {
             console.log("disconnect socket : " + socket.id);
             leaveRoom(socket);
@@ -251,19 +271,25 @@ function joinRoom(_userName, _roomName, _socket) {
 
 
 function leaveRoom(_socket) {
+    //if socket clientName not registered
+    console.log("leaveRoom >> Attempting to leave room");
     if( _socket.clientName == undefined){
-        console.log("leaveRoom > socket clientName not defined");
-        return;
+        console.log("ERROR !! : leaveRoom > socket clientName not defined");
+        return true;
     }
+    //if socket object contains clientName but that isn't an activeclient name
     else if( activeClients.get(_socket.clientName) == undefined)
-        {
-            console.log("leaveRoom > no such client, ERROR, This should never be printed");
-            return;
-        }
+    {
+        console.log("leaveRoom > no such client, ERROR, This should never be printed");
+        return false;
+    }
+    console.log(" # activeClient "+_socket.clientName+" is now calling its fxn : leaveCurrentRoom")
     //leave current room
     activeClients.get(_socket.clientName).leaveCurrentRoom();
-    
+    return true;
 }
+
+
 const getRand = function(low, high){
   return Math.floor((Math.random() * high) + low);
 }

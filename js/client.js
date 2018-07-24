@@ -19,3 +19,8 @@ Client.informOpponents= function()
 {
     Client.socket.emit('dataBroadcastRequest');
 }
+//ends game by requesting server to remove user from existing room
+Client.endGame = function()
+{
+    Client.socket.emit('requestRoomEnd');
+}
