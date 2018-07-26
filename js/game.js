@@ -5,8 +5,8 @@ for avoiding learning so many libraries
 Use : http://kvazars.com/littera/ to generate bitmap font's xml file (.fnt / xml)
 */
 var form = $("#form3");
-const VIEW_WIDTH = 1024;
-const VIEW_HEIGHT = 768;
+const VIEW_WIDTH = 1280;
+const VIEW_HEIGHT = 800;
 var target;
 var game = new Phaser.Game(VIEW_WIDTH, VIEW_HEIGHT, Phaser.CANVAS, '', {
     init: function () {
