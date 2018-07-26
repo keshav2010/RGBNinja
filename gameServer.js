@@ -163,8 +163,8 @@ exports.listen = function (server) {
             
         });
         
-        socket.on('input', (keyString)=>{
-            if(keyString === 'red')
+        socket.on('input', (data)=>{
+            if(data.color === 'red')
              {
                 activeClients.get(socket.clientName).updateRGB(0);
                 socket.broadcast.to(activeClients.get(socket.clientName).currentRoom.roomName).emit('opponentAction', activeClients.get(socket.clientName).getRGBValues());
@@ -172,7 +172,7 @@ exports.listen = function (server) {
                   //inform emitter about its own color on server
                 socket.emit('clientAction', activeClients.get(socket.clientName).getRGBValues());
              }
-            else if(keyString === 'green')
+            else if(data.color === 'green')
              {
                 activeClients.get(socket.clientName).updateRGB(1);
                 
@@ -182,7 +182,7 @@ exports.listen = function (server) {
                 //inform emitter about its own color on server
                 socket.emit('clientAction', activeClients.get(socket.clientName).getRGBValues());
              }
-            else if(keyString === 'blue')
+            else if(data.color === 'blue')
              {
                 activeClients.get(socket.clientName).updateRGB(2);
                  //inform other users about opponent display

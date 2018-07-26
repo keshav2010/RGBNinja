@@ -217,19 +217,19 @@ class Game extends Phaser.State {
         if (redKey.isDown) {
             this.redSlider.knob.moveKnob(1, this.redSlider);
             if (this.redSlider.getSliderValue() < 250)
-                Client.sendUserInput('input', 'red');
+                Client.sendUserInput('input', {color : 'red'});
         }
         if (greenKey.isDown) {
             
             this.greenSlider.knob.moveKnob(1, this.greenSlider);
             if (this.greenSlider.getSliderValue() < 250)
-                Client.sendUserInput('input', 'green');
+                Client.sendUserInput('input', {color : 'green'});
         }
         if (blueKey.isDown) {
             
             this.blueSlider.knob.moveKnob(1, this.blueSlider);
             if (this.blueSlider.getSliderValue() < 250)
-                Client.sendUserInput('input', 'blue');
+                Client.sendUserInput('input', {color: 'blue'});
         }
         
         if(this.game.input.activePointer.isDown)
@@ -241,21 +241,21 @@ class Game extends Phaser.State {
             {
                 this.redSlider.knob.moveKnob(1, this.redSlider);
                 if (this.redSlider.getSliderValue() < 250)
-                    Client.sendUserInput('input', 'red');
+                    Client.sendUserInput('input', {color: 'red'});
             }
             else if(pointer.x >= this.greenSlider.posx && pointer.x <= this.greenSlider.posx + this.greenSlider.sliderWidth
                   && pointer.y >= this.greenSlider.posy && pointer.y <= this.greenSlider.posy + this.greenSlider.barHeight)
             {
                 this.greenSlider.knob.moveKnob(1, this.greenSlider);
                 if (this.greenSlider.getSliderValue() < 250)
-                    Client.sendUserInput('input', 'green');
+                    Client.sendUserInput('input', {color: 'green'});
             }
             else if(pointer.x >= this.blueSlider.posx && pointer.x <= this.blueSlider.posx + this.blueSlider.sliderWidth
                   && pointer.y >= this.blueSlider.posy && pointer.y <= this.blueSlider.posy + this.blueSlider.barHeight)
             {
                 this.blueSlider.knob.moveKnob(1, this.blueSlider);
                 if (this.blueSlider.getSliderValue() < 250)
-                    Client.sendUserInput('input', 'blue');
+                    Client.sendUserInput('input', {color: 'blue'});
             }
         }
         
