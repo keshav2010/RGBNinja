@@ -17,9 +17,9 @@ function GameRoom(_roomName)
     this.playerCount = 0;
     
     this.generateRGBValue = function(){
-        this.RGBValue[0] = getRand(10, 200);
-        this.RGBValue[1] = getRand(15, 200);
-        this.RGBValue[2] = getRand(10, 250);
+        this.RGBValue[0] = getRand(10, 190);
+        this.RGBValue[1] = this.RGBValue[0] + getRand(0, 50);
+        this.RGBValue[2] = getRand(50, 250);
     }
     this.getRGB = function(){
         return this.RGBValue;
